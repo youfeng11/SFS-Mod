@@ -22,6 +22,14 @@
 
 # 在Gitee查看：https://gitee.com/YouFeng11/SFS-zh-CN-Translation
 
+# 版本：2025.02.12
+# 警告⚠️：
+#   该汉化是基于 MIT License 发布的开源作品，版权所有！
+#   除非你知道你应该怎么做，否则请不要将本作品在修改后传播！
+#   如果你想在修改后传播，请详细阅读并充分理解MIT协议！这已经很自由了！
+
+# 你已经被警告过了！！！
+
 [None]
     None=None
     Font=normal
@@ -84,10 +92,6 @@
     Credits_Text=
     Credits_Text=<Size=70> Ashton Mills </size>
     Credits_Text=<size=55> 作曲 </size>
-    Credits_Text=
-    Credits_Text=<Size=70> 由风 </size>
-    Credits_Text=<size=55> 汉化 </size>
-    Credits_Text=<size=40> 该汉化基于 MIT License 发布，版权所有！ </size>
 
     First_Time_Playing_Question=首次游玩
     First_Time_Playing_Question=Spaceflight Simulator?
@@ -120,12 +124,12 @@
 # Create menu
     Create_World_Title=世界名称
     Default_World_Name=我的世界
-    Select_Solar_System=选择世界的太阳系
+    Select_Solar_System=选择世界的星系
 
-    Select_Solar_System__NotFound=无法找到太阳系：
+    Select_Solar_System__NotFound=无法找到星系：
     Select_Solar_System__NotFound=%system%
     Select_Solar_System__NotFound=
-    Select_Solar_System__NotFound=选择一个新的太阳系
+    Select_Solar_System__NotFound=选择一个新的星系
 
     Default_Solar_System=太阳系（默认）
     Custom_Solar_System=%name%（自定义）
@@ -154,7 +158,7 @@
 [World Create Menu]
     World_Create_Title=创建世界
     World_Name_Label=世界名称：
-    Solar_System_Label=太阳系：
+    Solar_System_Label=星系：
     Mode_Label=模式：
     Difficulty_Label=难度：
 
@@ -371,7 +375,7 @@
 
 # Launch warnings
     Warnings_Title=警告：
-    Missing_Capsule=你的火箭没有太空舱或无人探测器，使其无法控制
+    Missing_Capsule=你的火箭没有太空舱或无人探测器，因此无法控制
     Missing_Parachute=你的火箭没有降落伞
     Missing_Heat_Shield=你的火箭没有隔热罩
     Missing_Fuel_Popup=无燃料来源

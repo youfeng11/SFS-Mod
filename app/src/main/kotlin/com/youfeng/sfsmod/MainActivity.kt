@@ -128,13 +128,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (!viewModel.isStop) {
+        if (viewModel.state != 1) {
             StartCoroutine()
         }
     }
     
     fun StartCoroutine() {
-        viewModel.offIsDone()
+        viewModel.loadingState()
         // 显示加载动画并隐藏完成图标
         /*binding.apply {
             wait.visibility = View.VISIBLE
@@ -156,7 +156,7 @@ class MainActivity : ComponentActivity() {
             }*/
             vibrate() // 触发设备震动反馈
             //showSnackbar(result) // 显示签名校验结果的提示信息
-            viewModel.onIsDone()
+            viewModel.doneState()
             // 根据签名校验结果延迟一段时间再处理
             delay(3000)
             if (!result) installApk(File(externalCacheDir, "temp.apk")) // 安装 APK 文件

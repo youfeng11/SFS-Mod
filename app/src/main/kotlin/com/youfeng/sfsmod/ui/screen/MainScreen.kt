@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Row
@@ -62,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -144,73 +147,45 @@ fun VersionInfo() {
 @Composable
 fun LoadingSection(viewModel: MainViewModel) {
     // 状态文本切换动画
-    //Column(horizontalAlignment = Alignment.CenterHorizontally) {
-    AnimatedContent(
-        targetState = viewModel.isStop,
-        /*transitionSpec = {
-                fadeIn(
-                    animationSpec = tween(50)
-            ) togetherWith fadeOut(animationSpec = tween(50))
-    },*/
-        label = "Loading Text Animation"
-    ) { isStop ->
-        if (isStop) {
-            if (viewModel.isDone) {
-                DoneScreen()
-            } else {
-                StopScreen()
-            }
-        } else {
-            LoadingScreen()
-        }
-    }
-}
-
-@Composable
-fun LoadingScreen() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        LinearProgressIndicator(
+    AnimatedContent(
+        targetState = viewModel.state,
+        transitionSpec = {
+        fadeIn(
+            animationSpec = tween(300)
+        ) togetherWith fadeOut(animationSpec = tween(300))
+    }
+    ) { state ->
+        when (state) {
+            0 -> {LinearProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-        )
-        Text(
-            text = stringResource(R.string.loading),
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
-
-@Composable
-fun DoneScreen() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            Icons.Filled.Done,
-            modifier = Modifier.size(width = 48.dp, height = 48.dp),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = "完成，3秒后安装",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
-    }
-}
-
-@Composable
-fun StopScreen() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
+        )}
+            1 -> {Icon(
             Icons.Filled.Close,
             modifier = Modifier.size(width = 48.dp, height = 48.dp),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = "已停止",
+        )}
+            2 -> {Icon(
+            Icons.Filled.Done,
+            modifier = Modifier.size(width = 48.dp, height = 48.dp),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary
+        )}
+            else -> Unit
+        }
+    }
+    Text(
+            modifier = Modifier.animateContentSize(),
+            text = when (viewModel.state) {
+            1 -> "已停止"
+            2 -> "完成，3秒后开始安装"
+            else -> stringResource(R.string.loading)
+        },
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.primary
+            color = if (viewModel.state == 0) Color.Unspecified else MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -237,7 +212,7 @@ private fun OverflowMenu(viewModel: MainViewModel) {
     }
 
     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-        val (menuText, menuIcon) = if (viewModel.isStop) {
+        val (menuText, menuIcon) = if (viewModel.state == 1) {
             "重启" to Icons.Filled.Refresh
         } else {
             stringResource(R.string.menu_stop) to Icons.Filled.Close
@@ -246,9 +221,11 @@ private fun OverflowMenu(viewModel: MainViewModel) {
         MenuItem(menuText, menuIcon) {
             menuExpanded = false
             context?.let {
-                if (viewModel.isStop) it.StartCoroutine() else it.StopCoroutine()
+            
+                it.StopCoroutine()/*
+                if (viewModel.state == 0) viewModel.stoppedState() else it.StartCoroutine()*/
+                if (viewModel.state != 1)  viewModel.stoppedState() else it.StartCoroutine()
             }
-            if (viewModel.isStop) viewModel.offIsStop() else viewModel.onIsStop()
         }
 
         HorizontalDivider()
