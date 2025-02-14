@@ -33,5 +33,5 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     
     <!-- 修复IDE的LogSender的权限问题 -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!--uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" /-->
 </manifest>

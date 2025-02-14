@@ -4,15 +4,15 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.scaleIn
+//import androidx.compose.animation.scaleIn
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.AnimatedVisibility
+//import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentSize
+//import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
@@ -21,10 +21,10 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.clickable
+//import androidx.compose.foundation.lazy.LazyColumn
+//import androidx.compose.foundation.lazy.LazyItemScope
+//import androidx.compose.foundation.lazy.items
+//import androidx.compose.foundation.clickable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -32,7 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Warning
+//import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.ContactPage
 import androidx.compose.material.icons.outlined.Info
@@ -41,7 +41,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Button
+//import androidx.compose.material3.Button
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -65,7 +65,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+//import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -74,15 +74,15 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
+
 import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.MainActivity
 import com.youfeng.sfsmod.R
 import com.youfeng.sfsmod.ui.theme.MainTheme
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
-
-import androidx.compose.ui.platform.LocalContext
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 
 @Composable
@@ -180,8 +180,8 @@ fun LoadingSection(viewModel: MainViewModel) {
     Text(
             modifier = Modifier.animateContentSize(),
             text = when (viewModel.state) {
-            1 -> "已停止"
-            2 -> "完成，3秒后开始安装"
+            1 -> stringResource(R.string.stopped)
+            2 -> stringResource(R.string.done, viewModel.timer)//"完成，${viewModel.timer}秒后开始安装"
             else -> stringResource(R.string.loading)
         },
             style = MaterialTheme.typography.bodyLarge,
@@ -213,7 +213,7 @@ private fun OverflowMenu(viewModel: MainViewModel) {
 
     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
         val (menuText, menuIcon) = if (viewModel.state == 1) {
-            "重启" to Icons.Filled.Refresh
+            stringResource(R.string.menu_refresh) to Icons.Filled.Refresh
         } else {
             stringResource(R.string.menu_stop) to Icons.Filled.Close
         }
@@ -221,9 +221,7 @@ private fun OverflowMenu(viewModel: MainViewModel) {
         MenuItem(menuText, menuIcon) {
             menuExpanded = false
             context?.let {
-            
-                it.StopCoroutine()/*
-                if (viewModel.state == 0) viewModel.stoppedState() else it.StartCoroutine()*/
+                it.StopCoroutine()
                 if (viewModel.state != 1)  viewModel.stoppedState() else it.StartCoroutine()
             }
         }

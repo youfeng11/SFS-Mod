@@ -13,9 +13,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.view.WindowCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
@@ -75,7 +73,7 @@ class MainActivity : ComponentActivity() {
         // 依次复制资源文件
         copyAssetFile("mod.xml", File(dataPath, "com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml"))
         copyAssetFile("translation.txt", File(languagePath, "简体中文.txt"))
-        copyAssetFile("base", File(externalCachePath, "temp.apk"))
+        copyAssetFile("base.apk.1", File(externalCachePath, "temp.apk"))
 
         // 验证签名是否一致，避免 APK 签名冲突
         return verifySignature(externalCachePath)
@@ -136,29 +134,22 @@ class MainActivity : ComponentActivity() {
     fun StartCoroutine() {
         viewModel.loadingState()
         // 显示加载动画并隐藏完成图标
-        /*binding.apply {
-            wait.visibility = View.VISIBLE
-            done.visibility = View.INVISIBLE
-        }*/
 
         // 启动协程执行异步任务
         coroutineScope = CoroutineScope(Dispatchers.Main + Job())
         coroutineScope?.launch {
             val result = copyResources() // 异步复制资源文件
-            /*// 隐藏加载动画，显示完成图标和动画
-            binding.apply {
-            wait.visibility = View.INVISIBLE
-                done.visibility = View.VISIBLE
-                done.setImageDrawable(
-                    ContextCompat.getDrawable(this@MainActivity, R.drawable.anim_done_mark)
-                )
-                (done.drawable as? AnimatedVectorDrawable)?.start()
-            }*/
+            // 隐藏加载动画，显示完成图标和动画
             vibrate() // 触发设备震动反馈
             //showSnackbar(result) // 显示签名校验结果的提示信息
             viewModel.doneState()
             // 根据签名校验结果延迟一段时间再处理
-            delay(3000)
+            delay(1000)
+            viewModel.startTimer()
+            delay(1000)
+            viewModel.startTimer()
+            delay(1000)
+            viewModel.startTimer()
             if (!result) installApk(File(externalCacheDir, "temp.apk")) // 安装 APK 文件
             finish() // 任务完成后关闭 Activity
         }

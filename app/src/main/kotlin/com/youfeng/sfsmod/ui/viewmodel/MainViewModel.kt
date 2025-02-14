@@ -5,24 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
-class MainViewModel : ViewModel() {/*
-    var isStop by mutableStateOf(false)
-        private set
-    var isDone by mutableStateOf(false)
-        private set
+class MainViewModel : ViewModel() {
+    var timer by mutableStateOf(3)
+        private set 
 
-    fun onIsStop() {
-        isStop = true
+    fun startTimer() {
+        timer--
     }
-    fun offIsStop() {
-        isStop = false
-    }
-    fun onIsDone() {
-        isDone = true
-    }
-    fun offIsDone() {
-        isDone = false
-    }*/
 
 
     var state by mutableStateOf(0)
@@ -36,5 +25,6 @@ class MainViewModel : ViewModel() {/*
     }
     fun doneState() {
         state = 2
+        timer = 3
     }
 }

@@ -16,11 +16,11 @@ android {
     ndkVersion = "27.1.12297006"
     
     defaultConfig {
-        applicationId = "com.youfeng.sfsmod"
+        applicationId = "com.StefMorojna.SpaceflightSimulator"
         minSdk = 23
         targetSdk = 35
         versionCode = 375
-        versionName = "1.5.10.5-3.0.0.Alpha01"
+        versionName = "1.5.10.5-3.0.0.Beta01"
         
         vectorDrawables { 
             useSupportLibrary = true
@@ -46,6 +46,7 @@ android {
             val dateFormat = SimpleDateFormat("yyMMddHHmmss")
             val currentDateTime = dateFormat.format(Date())
             versionNameSuffix = ".build$currentDateTime" // 使用UTC时间
+            applicationIdSuffix = ".debug"
         }
     }
 
@@ -62,10 +63,10 @@ android {
     dependenciesInfo {
         includeInApk = false
         includeInBundle = false
-    }
+    }/*
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15"
-    }
+    }*/
 
     aboutLibraries {
         registerAndroidTasks = false
