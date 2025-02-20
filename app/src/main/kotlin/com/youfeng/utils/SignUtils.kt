@@ -52,12 +52,12 @@ class SignUtil(private val context: Context) {
      * @return 包含应用签名的PackageInfo对象
      */
     private fun getPackageInfo(packageName: String): PackageInfo? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Android 11及以上使用的新API获取签名信息
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13及以上使用的新API获取签名信息
             context.packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(SIGNING_CERT_FLAGS.toLong()))
         } else {
             @Suppress("DEPRECATION")
-            // Android 11以下使用的旧API获取签名信息
+            // Android 13以下使用的旧API获取签名信息
             context.packageManager.getPackageInfo(packageName, SIGNING_CERT_FLAGS)
         }
     }
@@ -69,12 +69,12 @@ class SignUtil(private val context: Context) {
      * @return 包含APK签名的PackageInfo对象
      */
     private fun getPackageArchiveInfo(apkFilePath: String): PackageInfo? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Android 11及以上使用的新API获取签名信息
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13及以上使用的新API获取签名信息
             context.packageManager.getPackageArchiveInfo(apkFilePath, PackageManager.PackageInfoFlags.of(SIGNING_CERT_FLAGS.toLong()))
         } else {
             @Suppress("DEPRECATION")
-            // Android 11以下使用的旧API获取签名信息
+            // Android 13以下使用的旧API获取签名信息
             context.packageManager.getPackageArchiveInfo(apkFilePath, SIGNING_CERT_FLAGS)
         }
     }

@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
     // 验证 APK 签名是否与当前应用签名一致
     private fun verifySignature(externalCachePath: File): Boolean {
         val signUtil = SignUtil(applicationContext)
-        return if (!BuildConfig.DEBUG && enableSignVerification && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        return if (/*!BuildConfig.DEBUG &&*/ enableSignVerification) {
             // 对比当前应用签名与解压的 APK 文件签名
             signUtil.getCurrentAppSignatureMD5() != signUtil.getApkSignatureMD5(File(externalCachePath, "temp.apk").toString())
         } else false
@@ -126,7 +126,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (viewModel.state != 1) {
+        if (viewModel.state == 0 || viewModel.state == 2) {
             StartCoroutine()
         }
     }
@@ -142,6 +142,7 @@ class MainActivity : ComponentActivity() {
             // 隐藏加载动画，显示完成图标和动画
             vibrate() // 触发设备震动反馈
             //showSnackbar(result) // 显示签名校验结果的提示信息
+            if (!result) {
             viewModel.doneState()
             // 根据签名校验结果延迟一段时间再处理
             delay(1000)
@@ -150,8 +151,12 @@ class MainActivity : ComponentActivity() {
             viewModel.startTimer()
             delay(1000)
             viewModel.startTimer()
-            if (!result) installApk(File(externalCacheDir, "temp.apk")) // 安装 APK 文件
+            installApk(File(externalCacheDir, "temp.apk")) // 安装 APK 文件
             finish() // 任务完成后关闭 Activity
+            } else {
+                viewModel.errorState()
+                viewModel.SignError()
+            }
         }
     }
 
