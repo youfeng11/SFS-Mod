@@ -1,3 +1,4 @@
+import java.util.Properties
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -8,6 +9,15 @@ plugins {
     alias(libs.plugins.compose.compiler)
     id("kotlin-parcelize")
     alias(libs.plugins.aboutlibraries)
+}
+
+val keystoreDir = "$rootDir/keystore"
+val keystoreProps = Properties()
+for (name in arrayOf("release.properties")) {
+    val f = file("$keystoreDir/$name")
+    if (!f.exists()) continue
+    keystoreProps.load(f.inputStream())
+    break
 }
 
 android {
@@ -26,7 +36,24 @@ android {
             useSupportLibrary = true
         }
     }
-    
+
+    signingConfigs {
+        val keyAlias = keystoreProps.getProperty("keyAlias")
+        val keyPassword = keystoreProps.getProperty("keyPassword")
+        val storeFile = file("$keystoreDir/${keystoreProps.getProperty("storeFile")}")
+        val storePassword = keystoreProps.getProperty("storePassword")
+
+        create("release") {
+            this.keyAlias = keyAlias
+            this.keyPassword = keyPassword
+            this.storeFile = storeFile
+            this.storePassword = storePassword
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
+        }
+    }
+
     compileOptions {
         targetCompatibility = JavaVersion.VERSION_17
         sourceCompatibility = JavaVersion.VERSION_17
@@ -39,6 +66,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         
@@ -63,10 +91,7 @@ android {
     dependenciesInfo {
         includeInApk = false
         includeInBundle = false
-    }/*
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
-    }*/
+    }
 
     aboutLibraries {
         registerAndroidTasks = false

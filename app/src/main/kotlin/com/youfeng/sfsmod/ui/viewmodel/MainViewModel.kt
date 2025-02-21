@@ -6,37 +6,53 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
 class MainViewModel : ViewModel() {
-    var timer by mutableStateOf(3)
-        private set 
-    var errorInfo by mutableStateOf("")
-        private set 
 
-    fun startTimer() {
-        timer--
-    }
-
-
-    fun SignError() {
-        errorInfo = "签名不一致，安装无法进行！\n安装器可能被篡改，请从官方渠道（应用关于内的QQ群或123网盘）重新下载！"
-    }
-    fun VersionError() {
-        errorInfo = "版本号不一致，安装无法进行！\n安装器可能被篡改，请从官方渠道（应用关于内的QQ群或123网盘）重新下载！"
-    }
-
-    var state by mutableStateOf(0)
+    // 计时器
+    private val initialTimer = 3
+    var timer by mutableStateOf(initialTimer)
         private set
 
-    fun loadingState() {
-        state = 0
+    // 错误信息
+    var errorInfo by mutableStateOf("")
+        private set
+
+    // 状态
+    var state by mutableStateOf<ScreenState>(ScreenState.Loading)
+        private set
+
+    // 计时器递减
+    fun decrementTimer() {
+        if (timer > 0) timer--
     }
-    fun stoppedState() {
-        state = 1
+
+    // 设置错误信息
+    fun setSignError() {
+        errorInfo = "签名不一致，安装无法进行！\n安装器可能被篡改，请从官方渠道（应用关于内的QQ群或123网盘）重新下载！"
     }
-    fun doneState() {
-        state = 2
-        timer = 3
+
+    // 状态管理
+    fun setLoadingState() {
+        state = ScreenState.Loading
     }
-    fun errorState() {
-        state = 3
+
+    fun setStoppedState() {
+        state = ScreenState.Stopped
+    }
+
+    fun setDoneState() {
+        state = ScreenState.Done
+        timer = initialTimer
+    }
+
+    fun setErrorState() {
+        state = ScreenState.Error
+    }
+
+    // 定义更清晰的状态
+    sealed class ScreenState {
+        object Loading : ScreenState()
+        object Stopped : ScreenState()
+        object Done : ScreenState()
+        object Error : ScreenState()
     }
 }

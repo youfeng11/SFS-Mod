@@ -39,10 +39,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            window.isNavigationBarContrastEnforced = false
+        if (Locale.getDefault().getCountry()!="CN") {
+            finish()
+            return
         }
-        if (Locale.getDefault().getCountry()!="CN") finish()
         setContent {
             MainTheme {
                 MainScreen()
@@ -63,12 +63,12 @@ class MainActivity : ComponentActivity() {
     // 复制应用所需的资源文件，包括破解补丁、语言包等
     private suspend fun copyResources(): Boolean {
         // 定义资源文件路径
-        val dataPath = File("${dataDir.absolutePath}/shared_prefs/")
-        val languagePath = File(getExternalFilesDir("Custom Translations").toString())
-        val externalCachePath = File(externalCacheDir.toString())
+        val dataPath = File("${dataDir.absolutePath}/shared_prefs/").apply { mkdirs() }
+        val languagePath = File(getExternalFilesDir("Custom Translations").toString()).apply { mkdirs() }
+        val externalCachePath = File(externalCacheDir.toString()).apply { mkdirs() }
 
-        // 确保路径存在，避免潜在的崩溃
-        listOf(dataPath, languagePath, externalCachePath).forEach { it.mkdirs() }
+        /*/ 确保路径存在，避免潜在的崩溃
+        listOf(dataPath, languagePath, externalCachePath).forEach { it.mkdirs() }*/
 
         // 依次复制资源文件
         copyAssetFile("mod.xml", File(dataPath, "com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml"))
@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
     // 验证 APK 签名是否与当前应用签名一致
     private fun verifySignature(externalCachePath: File): Boolean {
         val signUtil = SignUtil(applicationContext)
-        return if (/*!BuildConfig.DEBUG &&*/ enableSignVerification) {
+        return if (/*!BuildConfig.DEBUG && */enableSignVerification) {
             // 对比当前应用签名与解压的 APK 文件签名
             signUtil.getCurrentAppSignatureMD5() != signUtil.getApkSignatureMD5(File(externalCachePath, "temp.apk").toString())
         } else false
@@ -126,13 +126,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (viewModel.state == 0 || viewModel.state == 2) {
+        if (viewModel.state is MainViewModel.ScreenState.Loading || viewModel.state is MainViewModel.ScreenState.Done) {
             StartCoroutine()
         }
     }
     
     fun StartCoroutine() {
-        viewModel.loadingState()
+        viewModel.setLoadingState()
         // 显示加载动画并隐藏完成图标
 
         // 启动协程执行异步任务
@@ -143,19 +143,17 @@ class MainActivity : ComponentActivity() {
             vibrate() // 触发设备震动反馈
             //showSnackbar(result) // 显示签名校验结果的提示信息
             if (!result) {
-            viewModel.doneState()
+            viewModel.setDoneState()
             // 根据签名校验结果延迟一段时间再处理
-            delay(1000)
-            viewModel.startTimer()
-            delay(1000)
-            viewModel.startTimer()
-            delay(1000)
-            viewModel.startTimer()
+            repeat(3) {
+                delay(1000)
+                viewModel.decrementTimer()
+            }
             installApk(File(externalCacheDir, "temp.apk")) // 安装 APK 文件
             finish() // 任务完成后关闭 Activity
             } else {
-                viewModel.errorState()
-                viewModel.SignError()
+                viewModel.setErrorState()
+                viewModel.setSignError()
             }
         }
     }

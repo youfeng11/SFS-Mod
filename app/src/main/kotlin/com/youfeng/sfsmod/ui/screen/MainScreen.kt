@@ -77,274 +77,6 @@ import com.youfeng.sfsmod.R
 import com.youfeng.sfsmod.ui.theme.MainTheme
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
-/*
-@Composable
-fun MainScreen() {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        MainLayout()
-    }
-}
-
-// 主界面布局
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainLayout(viewModel: MainViewModel = viewModel()) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.topbar_title)) },
-                actions = { OverflowMenu(viewModel) },
-                scrollBehavior = scrollBehavior
-            )
-        },
-        contentWindowInsets = WindowInsets.safeDrawing
-    ) { innerPadding ->
-        ContentArea(
-            modifier = Modifier.padding(innerPadding),
-            viewModel = viewModel
-        )
-    }
-}
-
-// 主界面内容区
-@Composable
-fun ContentArea(modifier: Modifier = Modifier, viewModel: MainViewModel) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier.fillMaxSize()
-    ) {
-        VersionInfo()
-        LoadingSection(viewModel)
-        DisclaimerText()
-    }
-}
-
-// 版本信息
-@Composable
-fun VersionInfo() {
-    val versionText = remember {
-        "v${BuildConfig.VERSION_NAME.substringBefore("-")}（${BuildConfig.VERSION_CODE}）"
-    }
-    Text(
-        text = versionText,
-        style = MaterialTheme.typography.titleMedium
-    )
-}
-
-// 加载进度条
-@Composable
-fun LoadingSection(viewModel: MainViewModel) {
-    // 状态文本切换动画
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-    AnimatedContent(
-        targetState = viewModel.state,
-        transitionSpec = {
-            fadeIn(
-                animationSpec = tween(300)
-            ) togetherWith fadeOut(animationSpec = tween(300))
-        }
-    ) { state ->
-        when (state) {
-            0 -> {LinearProgressIndicator(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        )}
-            1 -> {Icon(
-            Icons.Filled.Close,
-            modifier = Modifier.size(width = 48.dp, height = 48.dp),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary
-        )}
-            2 -> {Icon(
-            Icons.Filled.Done,
-            modifier = Modifier.size(width = 48.dp, height = 48.dp),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary
-        )}
-            3 -> {Icon(
-            Icons.Filled.Warning,
-            modifier = Modifier.size(width = 48.dp, height = 48.dp),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.error
-        )}
-            else -> Unit
-        }
-    }
-    Text(
-            modifier = Modifier.animateContentSize(),
-            textAlign = TextAlign.Center,
-            text = when (viewModel.state) {
-                1 -> stringResource(R.string.stopped)
-                2 -> stringResource(R.string.done, viewModel.timer)//"完成，${viewModel.timer}秒后开始安装"
-                3 -> viewModel.errorInfo
-                else -> stringResource(R.string.loading)
-            },
-            style = MaterialTheme.typography.bodyLarge,
-            color = when (viewModel.state) {
-                0 -> Color.Unspecified
-                3 -> MaterialTheme.colorScheme.error
-                else -> MaterialTheme.colorScheme.primary
-            }
-        )
-    }
-}
-
-// 免责声明
-@Composable
-fun DisclaimerText() {
-    Text(
-        text = stringResource(R.string.warnning),
-        style = MaterialTheme.typography.bodyMedium
-    )
-}
-
-// 溢出菜单
-@Composable
-private fun OverflowMenu(viewModel: MainViewModel) {
-    var menuExpanded by rememberSaveable { mutableStateOf(false) }
-    var openAboutDialog by rememberSaveable { mutableStateOf(false) }
-    var openCreditsDialog by rememberSaveable { mutableStateOf(false) }
-    val context = LocalContext.current as? MainActivity
-
-    IconButton(onClick = { menuExpanded = true }) {
-        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.more_vert))
-    }
-
-    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-        AnimatedContent(
-            targetState = viewModel.state != 1 && viewModel.state != 3
-        ) { isDone ->
-        val (menuText, menuIcon) = if (!isDone) {
-            stringResource(R.string.menu_refresh) to Icons.Filled.Refresh
-        } else {
-            stringResource(R.string.menu_stop) to Icons.Filled.Close
-        }
-        MenuItem(menuText, menuIcon) {
-            menuExpanded = false
-            context?.let {
-                it.StopCoroutine()
-                if (isDone) viewModel.stoppedState() else it.StartCoroutine()
-            }
-        }
-        }
-
-        HorizontalDivider()
-
-        MenuItem(stringResource(R.string.menu_about), Icons.Outlined.Info) {
-            menuExpanded = false
-            openAboutDialog = true
-        }
-
-        MenuItem(stringResource(R.string.menu_credits), Icons.Outlined.ContactPage) {
-            menuExpanded = false
-            openCreditsDialog = true
-        }
-    }
-
-    if (openAboutDialog) {
-        AboutDialog { openAboutDialog = false }
-    }
-    if (openCreditsDialog) {
-        CreditsDialog { openCreditsDialog = false }
-    }
-}
-
-// 菜单项封装
-@Composable
-fun MenuItem(text: String, icon: ImageVector, onClick: () -> Unit) {
-    DropdownMenuItem(
-        text = { Text(text) },
-        leadingIcon = { Icon(icon, contentDescription = null) },
-        onClick = onClick
-    )
-}
-
-// 关于对话框
-@Composable
-fun AboutDialog(onDismissRequest: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row {
-                    Image(
-                        painter = painterResource(id = R.mipmap.ic_launcher),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                    )
-                    Spacer(Modifier.width(18.dp))
-                    Column {
-                        Text(
-                            stringResource(id = R.string.app_name),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 18.sp
-                        )
-                        SelectionContainer {
-                        Text(
-                                "v${BuildConfig.VERSION_NAME}（${BuildConfig.VERSION_CODE}）",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 14.sp
-                            )
-                        }
-                        Spacer(Modifier.height(18.dp))
-                        AnnotatedLinkText(R.string.about_source_code)
-                    }
-                }
-            }
-        }
-    )
-}
-
-// 富文本链接
-@Composable
-fun AnnotatedLinkText(resId: Int) {
-    val annotatedString = AnnotatedString.fromHtml(
-        htmlString = stringResource(id = R.string.about_source_code),
-        linkStyles = TextLinkStyles(
-            style = SpanStyle(
-                color = MaterialTheme.colorScheme.primary,
-                textDecoration = TextDecoration.Underline,
-                fontWeight = FontWeight.Bold // 设置粗体
-            ),
-            pressedStyle = SpanStyle(
-                color = MaterialTheme.colorScheme.primary,
-                background = MaterialTheme.colorScheme.secondaryContainer,
-                textDecoration = TextDecoration.Underline,
-                fontWeight = FontWeight.Bold // 设置粗体
-            )
-        )
-    )
-    Text(
-        text = annotatedString,
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurface,
-        fontSize = 14.sp
-    )
-}
-
-// 开源库对话框
-@Composable
-fun CreditsDialog(onDismissRequest: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = { Text(stringResource(R.string.osl)) },
-        text = { LibrariesContainer(modifier = Modifier.fillMaxSize()) },
-        confirmButton = {
-            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.close)) }
-        }
-    )
-}
-*/
 
 @Composable
 fun MainScreen() {
@@ -414,15 +146,15 @@ fun LoadingSection(viewModel: MainViewModel) {
             modifier = Modifier.animateContentSize(),
             textAlign = TextAlign.Center,
             text = when (viewModel.state) {
-                1 -> stringResource(R.string.stopped)
-                2 -> stringResource(R.string.done, viewModel.timer)
-                3 -> viewModel.errorInfo
+                is MainViewModel.ScreenState.Stopped -> stringResource(R.string.stopped)
+                is MainViewModel.ScreenState.Done -> stringResource(R.string.done, viewModel.timer)
+                is MainViewModel.ScreenState.Error -> viewModel.errorInfo
                 else -> stringResource(R.string.loading)
             },
             style = MaterialTheme.typography.bodyLarge,
             color = when (viewModel.state) {
-                0 -> Color.Unspecified
-                3 -> MaterialTheme.colorScheme.error
+                is MainViewModel.ScreenState.Loading -> Color.Unspecified
+                is MainViewModel.ScreenState.Error -> MaterialTheme.colorScheme.error
                 else -> MaterialTheme.colorScheme.primary
             }
         )
@@ -430,11 +162,11 @@ fun LoadingSection(viewModel: MainViewModel) {
 }
 
 @Composable
-fun LoadingIcon(state: Int) {
+fun LoadingIcon(state: MainViewModel.ScreenState) {
     val iconData = when (state) {
-        1 -> Icons.Filled.Close to MaterialTheme.colorScheme.primary
-        2 -> Icons.Filled.Done to MaterialTheme.colorScheme.primary
-        3 -> Icons.Filled.Warning to MaterialTheme.colorScheme.error
+        is MainViewModel.ScreenState.Stopped -> Icons.Filled.Close to MaterialTheme.colorScheme.primary
+        is MainViewModel.ScreenState.Done -> Icons.Filled.Done to MaterialTheme.colorScheme.primary
+        is MainViewModel.ScreenState.Error -> Icons.Filled.Warning to MaterialTheme.colorScheme.error
         else -> null
     }
 
@@ -464,15 +196,22 @@ private fun OverflowMenu(viewModel: MainViewModel) {
     }
 
     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-        val isRunning = viewModel.state != 1 && viewModel.state != 3
-        MenuItem(
-            text = stringResource(if (isRunning) R.string.menu_stop else R.string.menu_refresh),
-            icon = if (isRunning) Icons.Filled.Close else Icons.Filled.Refresh
-        ) {
-            menuExpanded = false
-            context?.let {
-                it.StopCoroutine()
-                if (isRunning) viewModel.stoppedState() else it.StartCoroutine()
+        //val isRunning = 
+        AnimatedContent(
+            targetState = viewModel.state is MainViewModel.ScreenState.Loading || viewModel.state is MainViewModel.ScreenState.Done,
+            transitionSpec = {
+                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+            }
+        ) { isRunning ->
+            MenuItem(
+                text = stringResource(if (isRunning) R.string.menu_stop else R.string.menu_refresh),
+                icon = if (isRunning) Icons.Filled.Close else Icons.Filled.Refresh
+            ) {
+                menuExpanded = false
+                context?.let {
+                    it.StopCoroutine()
+                    if (isRunning) viewModel.setStoppedState() else it.StartCoroutine()
+                }
             }
         }
 
