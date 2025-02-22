@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import java.security.MessageDigest
+import android.content.pm.Signature
+import com.youfeng.utils.md5
+
 
 /**
  * 签名管理器类，用于获取应用程序或APK的签名信息，并生成MD5摘要。
@@ -15,7 +17,7 @@ class SignUtil(private val context: Context) {
 
     companion object {
         // 用于生成签名摘要的算法名称（MD5）
-        private const val DIGEST_ALGORITHM = "MD5"
+        //private const val DIGEST_ALGORITHM = "MD5"
         // 获取签名证书所需的标志
         private const val SIGNING_CERT_FLAGS = PackageManager.GET_SIGNING_CERTIFICATES
     }
@@ -59,7 +61,7 @@ class SignUtil(private val context: Context) {
             @Suppress("DEPRECATION")
             // Android 13以下使用的旧API获取签名信息
             context.packageManager.getPackageInfo(packageName, SIGNING_CERT_FLAGS)
-        }
+        } ?: error("无法检索当前应用程序包信息")
     }
 
     /**
@@ -69,14 +71,8 @@ class SignUtil(private val context: Context) {
      * @return 包含APK签名的PackageInfo对象
      */
     private fun getPackageArchiveInfo(apkFilePath: String): PackageInfo? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // Android 13及以上使用的新API获取签名信息
-            context.packageManager.getPackageArchiveInfo(apkFilePath, PackageManager.PackageInfoFlags.of(SIGNING_CERT_FLAGS.toLong()))
-        } else {
-            @Suppress("DEPRECATION")
-            // Android 13以下使用的旧API获取签名信息
-            context.packageManager.getPackageArchiveInfo(apkFilePath, SIGNING_CERT_FLAGS)
-        }
+        //@Suppress("DEPRECATION")
+        return context.packageManager.getPackageArchiveInfo(apkFilePath, SIGNING_CERT_FLAGS) ?: error("无法检索APK文件包信息，路径：$apkFilePath")
     }
 
     /**
@@ -87,20 +83,58 @@ class SignUtil(private val context: Context) {
      */
     private fun getSignatureMD5(packageInfoProvider: () -> PackageInfo?): String? {
         return packageInfoProvider()
-            ?.signingInfo
+            ?.signingInfo/*
             ?.apkContentsSigners
             ?.firstOrNull()
             ?.toByteArray()
-            ?.let { calculateMD5(it) }
+            ?.md5()*/
     }
+/*fun getSignatureMD5(packageInfoProvider: () -> PackageInfo?): String? {
+    val packageInfo = packageInfoProvider() ?: return null
 
-    /**
-     * 计算字节数组的MD5值并返回其十六进制表示。
-     *
-     * @param cert 签名的字节数组
-     * @return MD5摘要的十六进制字符串
-     */
-    private fun calculateMD5(cert: ByteArray): String {
-        return MessageDigest.getInstance(DIGEST_ALGORITHM).digest(cert).joinToString("") { "%02x".format(it) }
+    return try {
+        val signatures = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
+                // API 28+ 使用 signingInfo
+                packageInfo.signingInfo?.let {
+                    if (it.hasMultipleSigners()) it.apkContentsSigners else it.signingCertificateHistory
+                }
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N -> {
+                // API 24+ 使用 signingInfo
+                packageInfo.signingInfo?.apkContentsSigners
+            }
+            else -> {
+                // API 23 及以下使用 signatures
+                @Suppress("DEPRECATION")
+                packageInfo.signatures
+            }
+        }
+
+        if (signatures.isNullOrEmpty()) {
+            return null
+        }
+
+        // 取第一个签名生成 MD5（可根据需求调整多签名处理逻辑）
+        val signature = signatures.first()
+        generateMD5(signature.toByteArray())
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
     }
+}
+
+private fun generateMD5(bytes: ByteArray): String? {
+    return try {
+        val md = MessageDigest.getInstance("MD5")
+        val digest = md.digest(bytes)
+        digest.joinToString("") { "%02x".format(it) }
+    } catch (e: NoSuchAlgorithmException) {
+        // 理论上 Android 必须支持 MD5
+        null
+    } catch (e: Exception) {
+        null
+    }
+}*/
+
 }

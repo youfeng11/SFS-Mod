@@ -116,4 +116,6 @@ dependencies {
     
     implementation(libs.about.libraries.core)
     implementation(libs.about.libraries.ui)
+    
+    implementation(libs.square.okio)
 }

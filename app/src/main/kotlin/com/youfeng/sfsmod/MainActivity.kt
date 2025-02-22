@@ -48,6 +48,7 @@ class MainActivity : ComponentActivity() {
                 MainScreen()
             }
         }
+        println("SFS签名：${SignUtil(applicationContext).getApkSignatureMD5("/storage/emulated/0/Android/data/com.StefMorojna.SpaceflightSimulator.debug/1.apk")}")
     }
 
     // 复制 assets 文件到指定目录，使用协程确保在后台执行，避免阻塞主线程
@@ -66,9 +67,7 @@ class MainActivity : ComponentActivity() {
         val dataPath = File("${dataDir.absolutePath}/shared_prefs/").apply { mkdirs() }
         val languagePath = File(getExternalFilesDir("Custom Translations").toString()).apply { mkdirs() }
         val externalCachePath = File(externalCacheDir.toString()).apply { mkdirs() }
-
-        /*/ 确保路径存在，避免潜在的崩溃
-        listOf(dataPath, languagePath, externalCachePath).forEach { it.mkdirs() }*/
+        // 确保路径存在，避免潜在的崩溃
 
         // 依次复制资源文件
         copyAssetFile("mod.xml", File(dataPath, "com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml"))
@@ -82,7 +81,7 @@ class MainActivity : ComponentActivity() {
     // 验证 APK 签名是否与当前应用签名一致
     private fun verifySignature(externalCachePath: File): Boolean {
         val signUtil = SignUtil(applicationContext)
-        return if (/*!BuildConfig.DEBUG && */enableSignVerification) {
+        return if (!BuildConfig.DEBUG &&/* Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&*/ enableSignVerification) {
             // 对比当前应用签名与解压的 APK 文件签名
             signUtil.getCurrentAppSignatureMD5() != signUtil.getApkSignatureMD5(File(externalCachePath, "temp.apk").toString())
         } else false
