@@ -12,10 +12,6 @@ class MainViewModel : ViewModel() {
     var timer by mutableStateOf(initialTimer)
         private set
 
-    // 错误信息
-    var errorInfo by mutableStateOf("")
-        private set
-
     // 状态
     var state by mutableStateOf<ScreenState>(ScreenState.Loading)
         private set
@@ -23,11 +19,6 @@ class MainViewModel : ViewModel() {
     // 计时器递减
     fun decrementTimer() {
         if (timer > 0) timer--
-    }
-
-    // 设置错误信息
-    fun setSignError() {
-        errorInfo = "签名不一致，安装无法进行！\n安装器可能被篡改，请从官方渠道（应用关于内的QQ群或123网盘）重新下载！"
     }
 
     // 状态管理

@@ -148,7 +148,7 @@ fun LoadingSection(viewModel: MainViewModel) {
             text = when (viewModel.state) {
                 is MainViewModel.ScreenState.Stopped -> stringResource(R.string.stopped)
                 is MainViewModel.ScreenState.Done -> stringResource(R.string.done, viewModel.timer)
-                is MainViewModel.ScreenState.Error -> viewModel.errorInfo
+                is MainViewModel.ScreenState.Error -> stringResource(R.string.error)
                 else -> stringResource(R.string.loading)
             },
             style = MaterialTheme.typography.bodyLarge,

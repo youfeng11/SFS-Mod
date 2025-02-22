@@ -39,16 +39,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        if (Locale.getDefault().getCountry()!="CN") {
-            finish()
-            return
-        }
+        if (Locale.getDefault().getCountry()!="CN") finish()
         setContent {
             MainTheme {
                 MainScreen()
             }
         }
-        println("SFS签名：${SignUtil(applicationContext).getApkSignatureMD5("/storage/emulated/0/Android/data/com.StefMorojna.SpaceflightSimulator.debug/1.apk")}")
     }
 
     // 复制 assets 文件到指定目录，使用协程确保在后台执行，避免阻塞主线程
@@ -81,7 +77,7 @@ class MainActivity : ComponentActivity() {
     // 验证 APK 签名是否与当前应用签名一致
     private fun verifySignature(externalCachePath: File): Boolean {
         val signUtil = SignUtil(applicationContext)
-        return if (!BuildConfig.DEBUG &&/* Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&*/ enableSignVerification) {
+        return if (!BuildConfig.DEBUG && enableSignVerification) {
             // 对比当前应用签名与解压的 APK 文件签名
             signUtil.getCurrentAppSignatureMD5() != signUtil.getApkSignatureMD5(File(externalCachePath, "temp.apk").toString())
         } else false
@@ -152,7 +148,6 @@ class MainActivity : ComponentActivity() {
             finish() // 任务完成后关闭 Activity
             } else {
                 viewModel.setErrorState()
-                viewModel.setSignError()
             }
         }
     }
