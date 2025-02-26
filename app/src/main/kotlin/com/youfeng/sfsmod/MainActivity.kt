@@ -32,7 +32,6 @@ import com.youfeng.utils.SignUtil
 
 class MainActivity : ComponentActivity() {
 
-    private val enableSignVerification = true // 是否启用签名冲突验证(仅release)
     private var coroutineScope: CoroutineScope? = null // 协程Scope, 处理生命周期管理
     private val viewModel: MainViewModel by viewModels()
 
@@ -58,7 +57,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // 复制应用所需的资源文件，包括破解补丁、语言包等
-    private suspend fun copyResources(): Boolean {
+    private suspend fun copyResources(): Int {
         // 定义资源文件路径
         val dataPath = File("${dataDir.absolutePath}/shared_prefs/").apply { mkdirs() }
         val languagePath = File(getExternalFilesDir("Custom Translations").toString()).apply { mkdirs() }
@@ -75,12 +74,15 @@ class MainActivity : ComponentActivity() {
     }
 
     // 验证 APK 签名是否与当前应用签名一致
-    private fun verifySignature(externalCachePath: File): Boolean {
+    private fun verifySignature(externalCachePath: File): Int {
         val signUtil = SignUtil(applicationContext)
-        return if (!BuildConfig.DEBUG && enableSignVerification) {
-            // 对比当前应用签名与解压的 APK 文件签名
-            signUtil.getCurrentAppSignatureMD5() != signUtil.getApkSignatureMD5(File(externalCachePath, "temp.apk").toString())
-        } else false
+        val thisMD5 = signUtil.getCurrentAppSignatureMD5()
+        val apkMD5 = signUtil.getApkSignatureMD5(File(externalCachePath, "temp.apk").toString())
+        return when {
+            thisMD5.isNullOrEmpty() || apkMD5.isNullOrEmpty() -> 0
+            thisMD5 == apkMD5 -> 1
+            else -> 2
+        }
     }
 
     // 安装 APK 文件，适配不同 Android 版本的文件 URI 访问方式
@@ -137,17 +139,19 @@ class MainActivity : ComponentActivity() {
             // 隐藏加载动画，显示完成图标和动画
             vibrate() // 触发设备震动反馈
             //showSnackbar(result) // 显示签名校验结果的提示信息
-            if (!result) {
-            viewModel.setDoneState()
-            // 根据签名校验结果延迟一段时间再处理
-            repeat(3) {
-                delay(1000)
-                viewModel.decrementTimer()
-            }
-            installApk(File(externalCacheDir, "temp.apk")) // 安装 APK 文件
-            finish() // 任务完成后关闭 Activity
-            } else {
-                viewModel.setErrorState()
+            when (result) {
+                1 -> {
+                    viewModel.setDoneState()
+                    // 根据签名校验结果延迟一段时间再处理
+                    repeat(3) {
+                        delay(1000)
+                        viewModel.decrementTimer()
+                    }
+                    installApk(File(externalCacheDir, "temp.apk")) // 安装 APK 文件
+                    finish() // 任务完成后关闭 Activity
+                }
+                2 -> viewModel.setErrorState(getString(R.string.error_sign))
+                else -> viewModel.setErrorState(getString(R.string.error_none, "${Build.BRAND} ${Build.MODEL} ${Build.DEVICE} ${Build.VERSION.SDK_INT}"))
             }
         }
     }

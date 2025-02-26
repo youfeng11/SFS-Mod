@@ -69,6 +69,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.vector.ImageVector
+
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.youfeng.sfsmod.BuildConfig
@@ -76,6 +77,7 @@ import com.youfeng.sfsmod.MainActivity
 import com.youfeng.sfsmod.R
 import com.youfeng.sfsmod.ui.theme.MainTheme
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
+
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 
 @Composable
@@ -148,7 +150,7 @@ fun LoadingSection(viewModel: MainViewModel) {
             text = when (viewModel.state) {
                 is MainViewModel.ScreenState.Stopped -> stringResource(R.string.stopped)
                 is MainViewModel.ScreenState.Done -> stringResource(R.string.done, viewModel.timer)
-                is MainViewModel.ScreenState.Error -> stringResource(R.string.error)
+                is MainViewModel.ScreenState.Error -> (viewModel.state as MainViewModel.ScreenState.Error).message
                 else -> stringResource(R.string.loading)
             },
             style = MaterialTheme.typography.bodyLarge,

@@ -16,6 +16,10 @@ class MainViewModel : ViewModel() {
     var state by mutableStateOf<ScreenState>(ScreenState.Loading)
         private set
 
+    // 错误信息
+    var errorMessage by mutableStateOf("")
+        private set
+
     // 计时器递减
     fun decrementTimer() {
         if (timer > 0) timer--
@@ -35,8 +39,9 @@ class MainViewModel : ViewModel() {
         timer = initialTimer
     }
 
-    fun setErrorState() {
-        state = ScreenState.Error
+    fun setErrorState(message: String) {
+        errorMessage = message
+        state = ScreenState.Error(message)
     }
 
     // 定义更清晰的状态
@@ -44,6 +49,6 @@ class MainViewModel : ViewModel() {
         object Loading : ScreenState()
         object Stopped : ScreenState()
         object Done : ScreenState()
-        object Error : ScreenState()
+        data class Error(val message: String) : ScreenState()
     }
 }

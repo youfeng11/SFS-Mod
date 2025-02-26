@@ -1,5 +1,6 @@
 package com.youfeng.utils
 
+import android.content.pm.PackageInfo
 import java.io.File
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
@@ -15,3 +16,7 @@ fun ByteArray.toHexString(): String = joinToString("") { "%02X".format(it) }
 fun File.md5(): String = readBytes().md5()
 
 private fun ByteString.toHex(): String = toByteArray().toHexString()
+
+@Suppress("DEPRECATION")
+fun PackageInfo.signatureMD5(isOld: Boolean = false): String? = if (!isOld) signingInfo?.apkContentsSigners?.firstOrNull()?.toByteArray()?.md5() else signatures?.firstOrNull()?.toByteArray()?.md5()
+
