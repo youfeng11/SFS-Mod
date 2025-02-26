@@ -9,11 +9,13 @@ import android.net.Uri
 import android.view.View
 import android.content.Context
 import android.content.Intent
+
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.content.FileProvider
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
@@ -21,9 +23,16 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+
 import java.io.File
-import java.io.FileOutputStream
 import java.util.Locale
+
+import okio.FileSystem
+import okio.Path
+import okio.Path.Companion.toPath
+import okio.sink
+import okio.source
+import okio.buffer
 
 import com.youfeng.sfsmod.ui.screen.MainScreen
 import com.youfeng.sfsmod.ui.theme.MainTheme
@@ -47,14 +56,13 @@ class MainActivity : ComponentActivity() {
     }
 
     // 复制 assets 文件到指定目录，使用协程确保在后台执行，避免阻塞主线程
-    private suspend fun copyAssetFile(assetFileName: String, destinationFile: File) = withContext(Dispatchers.IO) {
-        assets.open(assetFileName).use { inputStream ->
-            FileOutputStream(destinationFile).use { output ->
-                // 使用 8KB 的缓冲区提升文件复制性能
-                inputStream.copyTo(output, 8 * 1024)
-            }
+   private suspend fun copyAssetFile(assetFileName: String, destinationFile: File) = withContext(Dispatchers.IO) {
+    assets.open(assetFileName).source().buffer().use { src ->
+        destinationFile.sink().buffer().use { dst ->
+            src.readAll(dst)
         }
     }
+}
 
     // 复制应用所需的资源文件，包括破解补丁、语言包等
     private suspend fun copyResources(): Int {
