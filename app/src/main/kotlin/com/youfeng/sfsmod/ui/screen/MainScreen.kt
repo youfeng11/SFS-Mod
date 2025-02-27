@@ -75,7 +75,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.MainActivity
 import com.youfeng.sfsmod.R
-import com.youfeng.sfsmod.ui.theme.MainTheme
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
@@ -211,8 +210,8 @@ private fun OverflowMenu(viewModel: MainViewModel) {
             ) {
                 menuExpanded = false
                 context?.let {
-                    it.StopCoroutine()
-                    if (isRunning) viewModel.setStoppedState() else it.StartCoroutine()
+                    it.stopCoroutine()
+                    if (isRunning) viewModel.setStoppedState() else it.startCoroutine()
                 }
             }
         }

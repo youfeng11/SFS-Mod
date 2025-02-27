@@ -2,11 +2,7 @@ package com.youfeng.sfsmod
 
 import android.os.Build
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.VibratorManager
-import android.os.Vibrator
 import android.net.Uri
-import android.view.View
 import android.content.Context
 import android.content.Intent
 
@@ -27,27 +23,28 @@ import kotlinx.coroutines.delay
 import java.io.File
 import java.util.Locale
 
-import okio.FileSystem
-import okio.Path
-import okio.Path.Companion.toPath
 import okio.sink
 import okio.source
 import okio.buffer
+import okio.FileSystem
+import okio.Path
+import okio.Path.Companion.toPath
 
 import com.youfeng.sfsmod.ui.screen.MainScreen
 import com.youfeng.sfsmod.ui.theme.MainTheme
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 import com.youfeng.utils.SignUtil
+import com.youfeng.os.vibrate
 
 class MainActivity : ComponentActivity() {
 
-    private var coroutineScope: CoroutineScope? = null // 协程Scope, 处理生命周期管理
+    private var coroutineScope: CoroutineScope? = null
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        if (Locale.getDefault().getCountry()!="CN") finish()
+        if (Locale.getDefault().country != "CN") finish()
         setContent {
             MainTheme {
                 MainScreen()
@@ -55,37 +52,46 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // 复制 assets 文件到指定目录，使用协程确保在后台执行，避免阻塞主线程
-   private suspend fun copyAssetFile(assetFileName: String, destinationFile: File) = withContext(Dispatchers.IO) {
-    assets.open(assetFileName).source().buffer().use { src ->
-        destinationFile.sink().buffer().use { dst ->
-            src.readAll(dst)
+    // 复制 assets 文件到指定目录
+    private suspend fun copyAssetFile(assetFileName: String, destinationPath: Path) = withContext(Dispatchers.IO) {
+        assets.open(assetFileName).source().buffer().use { src ->
+            FileSystem.SYSTEM.sink(destinationPath).buffer().use { dst ->
+                src.readAll(dst)
+            }
         }
     }
-}
 
-    // 复制应用所需的资源文件，包括破解补丁、语言包等
+    // 复制应用所需的资源文件
     private suspend fun copyResources(): Int {
-        // 定义资源文件路径
-        val dataPath = File("${dataDir.absolutePath}/shared_prefs/").apply { mkdirs() }
-        val languagePath = File(getExternalFilesDir("Custom Translations").toString()).apply { mkdirs() }
-        val externalCachePath = File(externalCacheDir.toString()).apply { mkdirs() }
-        // 确保路径存在，避免潜在的崩溃
+        val fileSystem = FileSystem.SYSTEM
 
-        // 依次复制资源文件
-        copyAssetFile("mod.xml", File(dataPath, "com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml"))
-        copyAssetFile("translation.txt", File(languagePath, "简体中文.txt"))
-        copyAssetFile("base.apk.1", File(externalCachePath, "temp.apk"))
+        val dataPath = "${dataDir.absolutePath}/shared_prefs/".toPath()
+        val languagePath = getExternalFilesDir("Custom Translations")?.absolutePath?.toPath()
+        val externalCachePath = externalCacheDir?.absolutePath?.toPath()
 
-        // 验证签名是否一致，避免 APK 签名冲突
+        // 创建目录（如果不存在）
+        fileSystem.createDirectories(dataPath)
+        if (languagePath != null) fileSystem.createDirectories(languagePath)
+        if (externalCachePath != null) fileSystem.createDirectories(externalCachePath)
+
+        // 复制资源文件
+        copyAssetFile("mod.xml", dataPath.resolve("com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml"))
+        if (languagePath != null) {
+            copyAssetFile("translation.txt", languagePath.resolve("简体中文.txt"))
+        }
+        if (externalCachePath != null) {
+            copyAssetFile("base.apk.1", externalCachePath.resolve("temp.apk"))
+        }
+
         return verifySignature(externalCachePath)
     }
 
-    // 验证 APK 签名是否与当前应用签名一致
-    private fun verifySignature(externalCachePath: File): Int {
+    // 验证 APK 签名
+    private fun verifySignature(externalCachePath: Path?): Int {
+        if (externalCachePath == null) return 0
         val signUtil = SignUtil(applicationContext)
         val thisMD5 = signUtil.getCurrentAppSignatureMD5()
-        val apkMD5 = signUtil.getApkSignatureMD5(File(externalCachePath, "temp.apk").toString())
+        val apkMD5 = signUtil.getApkSignatureMD5(externalCachePath.resolve("temp.apk").toString())
         return when {
             thisMD5.isNullOrEmpty() || apkMD5.isNullOrEmpty() -> 0
             thisMD5 == apkMD5 -> 1
@@ -93,84 +99,62 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // 安装 APK 文件，适配不同 Android 版本的文件 URI 访问方式
-    private fun installApk(apkFile: File) {
-        // 获取文件 URI，根据 Android 版本选择获取方式
+    // 安装 APK
+    private fun installApk(apkPath: Path) {
+        val apkFile = File(apkPath.toString()) // 仍然需要转换为 File
         val apkUri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             FileProvider.getUriForFile(this, "$packageName.provider", apkFile)
         } else {
             Uri.fromFile(apkFile)
         }
-        // 启动安装 APK 的 Intent
+
         Intent(Intent.ACTION_VIEW).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
             setDataAndType(apkUri, "application/vnd.android.package-archive")
-        }.also {
-            startActivity(it)
-        }
-    }
-
-    // 获取设备振动器的实例，适配不同 Android 版本的实现方式
-    private fun getVibrator(): Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
-    } else {
-        @Suppress("DEPRECATION")
-        getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    }
-
-    // 触发设备振动，适配不同 Android 版本的振动 API
-    private fun vibrate() {
-        val vibrator = getVibrator()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE))
-        } else {
-            @Suppress("DEPRECATION")
-            vibrator.vibrate(250)
-        }
+        }.also { startActivity(it) }
     }
 
     override fun onStart() {
         super.onStart()
         if (viewModel.state is MainViewModel.ScreenState.Loading || viewModel.state is MainViewModel.ScreenState.Done) {
-            StartCoroutine()
+            startCoroutine()
         }
     }
-    
-    fun StartCoroutine() {
-        viewModel.setLoadingState()
-        // 显示加载动画并隐藏完成图标
 
-        // 启动协程执行异步任务
+    fun startCoroutine() {
+        viewModel.setLoadingState()
         coroutineScope = CoroutineScope(Dispatchers.Main + Job())
         coroutineScope?.launch {
-            val result = copyResources() // 异步复制资源文件
-            // 隐藏加载动画，显示完成图标和动画
-            vibrate() // 触发设备震动反馈
-            //showSnackbar(result) // 显示签名校验结果的提示信息
+            val result = copyResources()
+            this@MainActivity.vibrate()
             when (result) {
                 1 -> {
                     viewModel.setDoneState()
-                    // 根据签名校验结果延迟一段时间再处理
                     repeat(3) {
                         delay(1000)
                         viewModel.decrementTimer()
                     }
-                    installApk(File(externalCacheDir, "temp.apk")) // 安装 APK 文件
-                    finish() // 任务完成后关闭 Activity
+                    installApk(externalCacheDir?.absolutePath?.toPath()?.resolve("temp.apk") ?: return@launch)
+                    finish()
                 }
                 2 -> viewModel.setErrorState(getString(R.string.error_sign))
-                else -> viewModel.setErrorState(getString(R.string.error_none, "${Build.BRAND} ${Build.MODEL} ${Build.DEVICE} ${Build.VERSION.SDK_INT}"))
+                else -> viewModel.setErrorState(
+                    getString(
+                        R.string.error_none,
+                        "${Build.BRAND} ${Build.MODEL} ${Build.DEVICE} ${Build.VERSION.SDK_INT}"
+                    )
+                )
             }
         }
     }
 
     override fun onStop() {
         super.onStop()
-        StopCoroutine()
+        stopCoroutine()
     }
-        
-    fun StopCoroutine() {
-        coroutineScope?.cancel() // 停止协程，取消正在运行的任务
-        coroutineScope = null // 清空协程Scope引用
+
+    fun stopCoroutine() {
+        coroutineScope?.cancel()
+        coroutineScope = null
     }
 }
