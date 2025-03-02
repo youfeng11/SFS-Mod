@@ -1,4 +1,4 @@
-package com.youfeng.utils
+package com.youfeng.sfsmod.utils
 
 import android.content.Context
 import android.content.pm.PackageInfo

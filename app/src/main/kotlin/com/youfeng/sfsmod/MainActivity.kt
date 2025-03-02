@@ -33,8 +33,8 @@ import okio.Path.Companion.toPath
 import com.youfeng.sfsmod.ui.screen.MainScreen
 import com.youfeng.sfsmod.ui.theme.MainTheme
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
-import com.youfeng.utils.SignUtil
-import com.youfeng.os.vibrate
+import com.youfeng.sfsmod.utils.SignUtil
+import com.youfeng.sfsmod.utils.vibrate
 
 class MainActivity : ComponentActivity() {
 
