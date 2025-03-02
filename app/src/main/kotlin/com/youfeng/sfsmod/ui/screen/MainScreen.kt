@@ -6,21 +6,14 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoreVert
@@ -29,12 +22,10 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.ContactPage
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
@@ -53,20 +44,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 //import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.fromHtml
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -75,9 +57,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.MainActivity
 import com.youfeng.sfsmod.R
+import com.youfeng.sfsmod.ui.component.AboutDialog
+import com.youfeng.sfsmod.ui.component.CreditsDialog
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
-
-import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 
 @Composable
 fun MainScreen() {
@@ -197,7 +179,6 @@ private fun OverflowMenu(viewModel: MainViewModel) {
     }
 
     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-        //val isRunning = 
         AnimatedContent(
             targetState = viewModel.state is MainViewModel.ScreenState.Loading || viewModel.state is MainViewModel.ScreenState.Done,
             transitionSpec = {
@@ -229,7 +210,7 @@ private fun OverflowMenu(viewModel: MainViewModel) {
         }
     }
 
-    if (openAboutDialog) AboutDialog { openAboutDialog = false }
+    if (openAboutDialog) AboutDialog(stringResource(R.string.about_source_code)) { openAboutDialog = false }
     if (openCreditsDialog) CreditsDialog { openCreditsDialog = false }
 }
 
@@ -239,85 +220,5 @@ fun MenuItem(text: String, icon: ImageVector, onClick: () -> Unit) {
         text = { Text(text) },
         leadingIcon = { Icon(icon, contentDescription = null) },
         onClick = onClick
-    )
-}
-
-
-// 关于对话框
-@Composable
-fun AboutDialog(onDismissRequest: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row {
-                    Image(
-                        painter = painterResource(id = R.mipmap.ic_launcher),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                    )
-                    Spacer(Modifier.width(18.dp))
-                    Column {
-                        Text(
-                            stringResource(id = R.string.app_name),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 18.sp
-                        )
-                        SelectionContainer {
-                        Text(
-                                "v${BuildConfig.VERSION_NAME}（${BuildConfig.VERSION_CODE}）",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 14.sp
-                            )
-                        }
-                        Spacer(Modifier.height(18.dp))
-                        AnnotatedLinkText(R.string.about_source_code)
-                    }
-                }
-            }
-        }
-    )
-}
-
-// 富文本链接
-@Composable
-fun AnnotatedLinkText(resId: Int) {
-    val annotatedString = AnnotatedString.fromHtml(
-        htmlString = stringResource(id = R.string.about_source_code),
-        linkStyles = TextLinkStyles(
-            style = SpanStyle(
-                color = MaterialTheme.colorScheme.primary,
-                textDecoration = TextDecoration.Underline,
-                fontWeight = FontWeight.Bold // 设置粗体
-            ),
-            pressedStyle = SpanStyle(
-                color = MaterialTheme.colorScheme.primary,
-                background = MaterialTheme.colorScheme.secondaryContainer,
-                textDecoration = TextDecoration.Underline,
-                fontWeight = FontWeight.Bold // 设置粗体
-            )
-        )
-    )
-    Text(
-        text = annotatedString,
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurface,
-        fontSize = 14.sp
-    )
-}
-
-@Composable
-fun CreditsDialog(onDismissRequest: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = { Text(stringResource(R.string.osl)) },
-        text = { LibrariesContainer(modifier = Modifier.fillMaxSize()) },
-        confirmButton = {
-            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.close)) }
-        }
     )
 }
