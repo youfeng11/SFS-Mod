@@ -36,6 +36,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -53,6 +55,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.vector.ImageVector
 
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+
+import androidx.compose.runtime.LaunchedEffect
 
 import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.MainActivity
@@ -62,15 +69,35 @@ import com.youfeng.sfsmod.ui.component.CreditsDialog
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: MainViewModel = viewModel()) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> viewModel.startCoroutineOnStart()
+                Lifecycle.Event.ON_STOP -> viewModel.stopCoroutine()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    
+    val context = LocalContext.current as? MainActivity
+    LaunchedEffect(Unit) {
+        viewModel.finishEvent.collect {
+            context?.finish()
+        }
+    }
+
     Surface(modifier = Modifier.fillMaxSize()) {
-        MainLayout()
+        MainLayout(viewModel)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainLayout(viewModel: MainViewModel = viewModel()) {
+fun MainLayout(viewModel: MainViewModel) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -119,7 +146,7 @@ fun VersionInfo() {
 fun LoadingSection(viewModel: MainViewModel) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         AnimatedContent(
-            targetState = viewModel.state,
+            targetState = viewModel.state.collectAsState().value,
             transitionSpec = {
                 fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
             }
@@ -128,14 +155,14 @@ fun LoadingSection(viewModel: MainViewModel) {
         Text(
             modifier = Modifier.animateContentSize(),
             textAlign = TextAlign.Center,
-            text = when (viewModel.state) {
+            text = when (viewModel.state.collectAsState().value) {
                 is MainViewModel.ScreenState.Stopped -> stringResource(R.string.stopped)
-                is MainViewModel.ScreenState.Done -> stringResource(R.string.done, viewModel.timer)
-                is MainViewModel.ScreenState.Error -> (viewModel.state as MainViewModel.ScreenState.Error).message
+                is MainViewModel.ScreenState.Done -> stringResource(R.string.done, viewModel.timer.collectAsState().value)
+                is MainViewModel.ScreenState.Error -> (viewModel.state.collectAsState().value as MainViewModel.ScreenState.Error).message
                 else -> stringResource(R.string.loading)
             },
             style = MaterialTheme.typography.bodyLarge,
-            color = when (viewModel.state) {
+            color = when (viewModel.state.collectAsState().value) {
                 is MainViewModel.ScreenState.Loading -> Color.Unspecified
                 is MainViewModel.ScreenState.Error -> MaterialTheme.colorScheme.error
                 else -> MaterialTheme.colorScheme.primary
@@ -172,7 +199,6 @@ private fun OverflowMenu(viewModel: MainViewModel) {
     var menuExpanded by rememberSaveable { mutableStateOf(false) }
     var openAboutDialog by rememberSaveable { mutableStateOf(false) }
     var openCreditsDialog by rememberSaveable { mutableStateOf(false) }
-    val context = LocalContext.current as? MainActivity
 
     IconButton(onClick = { menuExpanded = true }) {
         Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.more_vert))
@@ -180,7 +206,7 @@ private fun OverflowMenu(viewModel: MainViewModel) {
 
     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
         AnimatedContent(
-            targetState = viewModel.state is MainViewModel.ScreenState.Loading || viewModel.state is MainViewModel.ScreenState.Done,
+            targetState = viewModel.state.collectAsState().value is MainViewModel.ScreenState.Loading || viewModel.state.collectAsState().value is MainViewModel.ScreenState.Done,
             transitionSpec = {
                 fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
             }
@@ -190,10 +216,8 @@ private fun OverflowMenu(viewModel: MainViewModel) {
                 icon = if (isRunning) Icons.Filled.Close else Icons.Filled.Refresh
             ) {
                 menuExpanded = false
-                context?.let {
-                    it.stopCoroutine()
-                    if (isRunning) viewModel.setStoppedState() else it.startCoroutine()
-                }
+                viewModel.stopCoroutine()
+                if (isRunning) viewModel.setStoppedState() else viewModel.startCoroutine()
             }
         }
 

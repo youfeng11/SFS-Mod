@@ -1,50 +1,79 @@
 package com.youfeng.sfsmod.ui.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import android.app.Application
+import android.os.Build
 
-class MainViewModel : ViewModel() {
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 
-    // 计时器
-    private val initialTimer = 3
-    var timer by mutableStateOf(initialTimer)
-        private set
+import com.youfeng.sfsmod.R
+import com.youfeng.sfsmod.data.MainRepository
+import com.youfeng.sfsmod.utils.vibrate
 
-    // 状态
-    var state by mutableStateOf<ScreenState>(ScreenState.Loading)
-        private set
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
-    // 错误信息
-    var errorMessage by mutableStateOf("")
-        private set
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    // 计时器递减
-    fun decrementTimer() {
-        if (timer > 0) timer--
-    }
+    private val repository = MainRepository(application.applicationContext)
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    // 状态管理
-    fun setLoadingState() {
-        state = ScreenState.Loading
-    }
+    private val _state = MutableStateFlow<ScreenState>(ScreenState.Loading)
+    val state: StateFlow<ScreenState> = _state
+
+    private val _timer = MutableStateFlow(3)
+    val timer: StateFlow<Int> = _timer
+
+    val finishEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     fun setStoppedState() {
-        state = ScreenState.Stopped
+        _state.value = ScreenState.Stopped
     }
 
-    fun setDoneState() {
-        state = ScreenState.Done
-        timer = initialTimer
+    fun startCoroutineOnStart() {
+        if (_state.value is ScreenState.Loading || _state.value is MainViewModel.ScreenState.Done) {
+            startCoroutine()
+        }
     }
 
-    fun setErrorState(message: String) {
-        errorMessage = message
-        state = ScreenState.Error(message)
+    fun startCoroutine() {
+        stopCoroutine()
+
+        _state.value = ScreenState.Loading
+        coroutineScope.launch {
+            val result = repository.copyResources()
+            getApplication<Application>().applicationContext.vibrate()
+            handleCopyResult(result)
+        }
     }
 
-    // 定义更清晰的状态
+    fun stopCoroutine() {
+        coroutineScope.coroutineContext.cancelChildren()
+    }
+
+    private suspend fun handleCopyResult(result: Int) {
+        when (result) {
+            1 -> {
+                _state.value = ScreenState.Done
+                for (i in 3 downTo 0) {
+                    _timer.value = i
+                    delay(1000)
+                }
+                repository.installApk()
+                finishEvent.emit(Unit)
+            }
+            2 -> _state.value = ScreenState.Error(getApplication<Application>().getString(R.string.error_sign))
+            else -> _state.value = ScreenState.Error(getApplication<Application>().getString(R.string.error_none, "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"))
+        }
+    }
+
     sealed class ScreenState {
         object Loading : ScreenState()
         object Stopped : ScreenState()

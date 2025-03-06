@@ -1,6 +1,7 @@
-import java.util.Properties
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Properties
+import java.util.UUID
 
 plugins {
     alias(libs.plugins.agp.app)
@@ -78,9 +79,10 @@ android {
         }
         
         debug {
-            val dateFormat = SimpleDateFormat("yyMMddHHmmss")
+            val randomSuffix = UUID.randomUUID().toString().take(6)
+            val dateFormat = SimpleDateFormat("yyMMdd")
             val currentDateTime = dateFormat.format(Date())
-            versionNameSuffix = ".build$currentDateTime" // 使用UTC时间
+            versionNameSuffix = ".$currentDateTime.$randomSuffix" // 使用UTC时间
             applicationIdSuffix = ".debug"
         }
     }
@@ -124,5 +126,5 @@ dependencies {
     implementation(libs.about.libraries.core)
     implementation(libs.about.libraries.ui)
     
-    implementation(libs.square.okio)
+    implementation(libs.okio)
 }

@@ -9,7 +9,7 @@
     <string name="close">关闭</string>
     <string name="stopped">已停止</string>
     <string name="error_sign">签名不一致，安装无法进行！\n安装器可能被篡改，请从官方渠道（应用关于内的QQ群或123网盘）重新下载！</string>
-    <string name="error_none">签名信息获取失败！\n出现了一些问题，为安全起见安装已被停止！\n安装器可能被篡改，请从官方渠道重新下载！若问题依旧存在，请向开发者反馈！\n设备信息：%s</string>
+    <string name="error_none">签名信息获取失败！\n出现了一些问题，或安装器被篡改，请尝试从官方渠道重新下载安装！\n若问题无法解决，请向开发者反馈！\n设备信息：%s</string>
     <string name="done">完成，%d 秒后开始安装</string>
     
     <string name="more_vert">更多选项</string>

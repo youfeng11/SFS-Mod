@@ -37,4 +37,4 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 about-libraries-core = { group = "com.mikepenz", name = "aboutlibraries-core", version.ref = "about-libraries" }
 about-libraries-ui = { group = "com.mikepenz", name = "aboutlibraries-compose-m3", version.ref = "about-libraries" }
 
-square-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
+okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
