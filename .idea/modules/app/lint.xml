@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="UnusedResources">
+        <ignore path="D:/SFS-Mod/app/src/main/res/raw/aboutlibraries.json" />
+        <ignore path="D:/SFS-Mod/app/src/main/res/raw/aboutlibraries.json" />
+    </issue>
+</lint>

@@ -8,6 +8,8 @@ activity-compose = "1.10.1"
 lifecycle = "2.8.7"
 about-libraries = "11.6.3"
 okio = "3.10.2"
+hilt = "2.55"
+androidxHilt = "1.2.0"
 
 [plugins]
 agp-lib = { id = "com.android.library", version.ref = "agp" }
@@ -15,7 +17,7 @@ agp-app = { id = "com.android.application", version.ref = "agp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
+hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "about-libraries" }
 
 [libraries]
@@ -26,11 +28,14 @@ compose-uiToolingPreview = { group = "androidx.compose.ui", name = "ui-tooling-p
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-materialIcons = { group = "androidx.compose.material", name = "material-icons-extended" }
-
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidxHilt" }
 androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 
 androidx-core = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
 

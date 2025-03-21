@@ -1,5 +1,6 @@
 package com.youfeng.sfsmod.ui.screen
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -49,23 +50,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.youfeng.sfsmod.BuildConfig
-import com.youfeng.sfsmod.MainActivity
 import com.youfeng.sfsmod.R
 import com.youfeng.sfsmod.ui.component.AboutDialog
 import com.youfeng.sfsmod.ui.component.CreditsDialog
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 
 @Composable
-fun MainScreen(viewModel: MainViewModel = viewModel()) {
+fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -79,7 +78,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
     
-    val context = LocalContext.current as? MainActivity
+    val context = LocalActivity.current
     LaunchedEffect(Unit) {
         viewModel.finishEvent.collect {
             context?.finish()

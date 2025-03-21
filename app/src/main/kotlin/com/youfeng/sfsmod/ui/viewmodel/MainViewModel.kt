@@ -1,11 +1,13 @@
 package com.youfeng.sfsmod.ui.viewmodel
 
-import android.app.Application
+import android.content.Context
 import android.os.Build
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import com.youfeng.sfsmod.R
 import com.youfeng.sfsmod.data.MainRepository
 import com.youfeng.sfsmod.utils.vibrate
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,10 +17,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val repository: MainRepository
+) : ViewModel() {
 
-    private val repository = MainRepository(application.applicationContext)
     private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     private val _state = MutableStateFlow<ScreenState>(ScreenState.Loading)
@@ -45,7 +51,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _state.value = ScreenState.Loading
         coroutineScope.launch {
             val result = repository.copyResources()
-            getApplication<Application>().applicationContext.vibrate()
+            context.vibrate()
             handleCopyResult(result)
         }
     }
@@ -65,8 +71,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 repository.installApk()
                 finishEvent.emit(Unit)
             }
-            2 -> _state.value = ScreenState.Error(getApplication<Application>().getString(R.string.error_sign))
-            else -> _state.value = ScreenState.Error(getApplication<Application>().getString(R.string.error_none, "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"))
+
+            2 -> _state.value = ScreenState.Error(context.getString(R.string.error_sign))
+            else -> _state.value = ScreenState.Error(
+                context.getString(
+                    R.string.error_none,
+                    "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
+                )
+            )
         }
     }
 

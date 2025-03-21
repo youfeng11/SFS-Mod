@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.agp.app)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.compose.compiler)
     id("kotlin-parcelize")
     alias(libs.plugins.aboutlibraries)
@@ -118,6 +119,11 @@ dependencies {
 
     implementation(libs.androidx.lifecycle)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    
+    implementation(libs.androidx.hilt.navigation.compose)
 
     implementation(libs.androidx.core)
     implementation(libs.compose.ui)
