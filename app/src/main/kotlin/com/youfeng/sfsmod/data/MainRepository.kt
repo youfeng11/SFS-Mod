@@ -2,7 +2,6 @@ package com.youfeng.sfsmod.data
 
 import android.content.Context
 
-import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.utils.SignUtil
 import com.youfeng.sfsmod.utils.copyAssetFile
 import com.youfeng.sfsmod.utils.installApk
@@ -16,6 +15,10 @@ import okio.Path
 import okio.Path.Companion.toPath
 import javax.inject.Inject
 import javax.inject.Singleton
+
+const val GET_SIGNATURE_UNAVAILABLE = 0
+const val GET_SIGNATURE_VALID = 1
+const val GET_SIGNATURE_MISMATCH = 2
 
 @Singleton
 class MainRepository @Inject constructor(
@@ -44,15 +47,14 @@ class MainRepository @Inject constructor(
     }
 
     private fun verifySignature(externalCachePath: Path?): Int {
-        if (BuildConfig.DEBUG) return 1
-        externalCachePath ?: return 0
+        externalCachePath ?: return GET_SIGNATURE_UNAVAILABLE
         val signUtil = SignUtil(context)
         val thisMD5 = signUtil.getCurrentAppSignatureMD5()
         val apkMD5 = signUtil.getApkSignatureMD5(externalCachePath.resolve("temp.apk").toString())
         return when {
-            thisMD5.isNullOrEmpty() || apkMD5.isNullOrEmpty() -> 0
-            thisMD5 == apkMD5 -> 1
-            else -> 2
+            thisMD5.isNullOrEmpty() || apkMD5.isNullOrEmpty() -> GET_SIGNATURE_UNAVAILABLE
+            thisMD5 == apkMD5 -> GET_SIGNATURE_VALID
+            else -> GET_SIGNATURE_MISMATCH
         }
     }
 

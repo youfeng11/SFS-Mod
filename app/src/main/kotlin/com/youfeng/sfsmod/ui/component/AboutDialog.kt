@@ -24,6 +24,7 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.youfeng.sfsmod.BuildConfig
@@ -94,4 +95,10 @@ fun AnnotatedLinkText(htmlString: String) {
         color = MaterialTheme.colorScheme.onSurface,
         fontSize = 14.sp
     )
+}
+
+@Preview
+@Composable
+fun AboutDialogPreview() {
+    AboutDialog(stringResource(R.string.about_source_code)) { }
 }

@@ -77,7 +77,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    
+
     val context = LocalActivity.current
     LaunchedEffect(Unit) {
         viewModel.finishEvent.collect {
@@ -152,7 +152,11 @@ fun LoadingSection(viewModel: MainViewModel) {
             textAlign = TextAlign.Center,
             text = when (viewModel.state.collectAsState().value) {
                 is MainViewModel.ScreenState.Stopped -> stringResource(R.string.stopped)
-                is MainViewModel.ScreenState.Done -> stringResource(R.string.done, viewModel.timer.collectAsState().value)
+                is MainViewModel.ScreenState.Done -> stringResource(
+                    R.string.done,
+                    viewModel.timer.collectAsState().value
+                )
+
                 is MainViewModel.ScreenState.Error -> (viewModel.state.collectAsState().value as MainViewModel.ScreenState.Error).message
                 else -> stringResource(R.string.loading)
             },
@@ -229,7 +233,9 @@ private fun OverflowMenu(viewModel: MainViewModel) {
         }
     }
 
-    if (openAboutDialog) AboutDialog(stringResource(R.string.about_source_code)) { openAboutDialog = false }
+    if (openAboutDialog) AboutDialog(stringResource(R.string.about_source_code)) {
+        openAboutDialog = false
+    }
     if (openCreditsDialog) CreditsDialog { openCreditsDialog = false }
 }
 

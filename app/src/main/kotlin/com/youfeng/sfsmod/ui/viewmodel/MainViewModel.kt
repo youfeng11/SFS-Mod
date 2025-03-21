@@ -4,6 +4,9 @@ import android.content.Context
 import android.os.Build
 import androidx.lifecycle.ViewModel
 import com.youfeng.sfsmod.R
+import com.youfeng.sfsmod.data.GET_SIGNATURE_MISMATCH
+import com.youfeng.sfsmod.data.GET_SIGNATURE_UNAVAILABLE
+import com.youfeng.sfsmod.data.GET_SIGNATURE_VALID
 import com.youfeng.sfsmod.data.MainRepository
 import com.youfeng.sfsmod.utils.vibrate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +19,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -36,11 +40,11 @@ class MainViewModel @Inject constructor(
     val finishEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     fun setStoppedState() {
-        _state.value = ScreenState.Stopped
+        _state.update { ScreenState.Stopped }
     }
 
     fun startCoroutineOnStart() {
-        if (_state.value is ScreenState.Loading || _state.value is ScreenState.Done) {
+        if (state.value is ScreenState.Loading || state.value is ScreenState.Done) {
             startCoroutine()
         }
     }
@@ -48,7 +52,7 @@ class MainViewModel @Inject constructor(
     fun startCoroutine() {
         stopCoroutine()
 
-        _state.value = ScreenState.Loading
+        _state.update { ScreenState.Loading }
         coroutineScope.launch {
             val result = repository.copyResources()
             context.vibrate()
@@ -62,23 +66,25 @@ class MainViewModel @Inject constructor(
 
     private suspend fun handleCopyResult(result: Int) {
         when (result) {
-            1 -> {
-                _state.value = ScreenState.Done
+            GET_SIGNATURE_VALID -> {
+                _state.update { ScreenState.Done }
                 for (i in 3 downTo 0) {
-                    _timer.value = i
+                    _timer.update { i }
                     delay(1000)
                 }
                 repository.installApk()
                 finishEvent.emit(Unit)
             }
 
-            2 -> _state.value = ScreenState.Error(context.getString(R.string.error_sign))
-            else -> _state.value = ScreenState.Error(
-                context.getString(
-                    R.string.error_none,
-                    "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
+            GET_SIGNATURE_MISMATCH -> _state.update { ScreenState.Error(context.getString(R.string.error_sign)) }
+            GET_SIGNATURE_UNAVAILABLE -> _state.update {
+                ScreenState.Error(
+                    context.getString(
+                        R.string.error_none,
+                        "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
+                    )
                 )
-            )
+            }
         }
     }
 
