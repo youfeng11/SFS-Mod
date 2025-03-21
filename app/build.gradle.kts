@@ -25,18 +25,18 @@ android {
     namespace = "com.youfeng.sfsmod"
     compileSdk = 35
     ndkVersion = "27.1.12297006"
-    
+
     defaultConfig {
         applicationId = "com.StefMorojna.SpaceflightSimulator"
         minSdk = 23
         targetSdk = 35
         versionCode = 375
         versionName = "1.5.10.5-3.0.0.Beta04"
-        
-        vectorDrawables { 
+
+        vectorDrawables {
             useSupportLibrary = true
         }
-        
+
         ndk {
             abiFilters.clear()
             abiFilters.add("arm64-v8a")
@@ -75,9 +75,12 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("release")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
-        
+
         debug {
             val randomSuffix = UUID.randomUUID().toString().take(6)
             val dateFormat = SimpleDateFormat("yyMMdd")
@@ -112,19 +115,19 @@ dependencies {
 
     implementation(libs.compose.material3)
     implementation(libs.compose.uiToolingPreview)
-    
+
     implementation(libs.androidx.lifecycle)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    
+
     implementation(libs.androidx.core)
     implementation(libs.compose.ui)
     implementation(libs.androidx.activity.compose)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.compose.uiTooling)
     implementation(libs.compose.materialIcons)
-    
+
     implementation(libs.about.libraries.core)
     implementation(libs.about.libraries.ui)
-    
+
     implementation(libs.okio)
 }
