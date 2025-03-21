@@ -2,23 +2,19 @@ package com.youfeng.sfsmod.ui.viewmodel
 
 import android.app.Application
 import android.os.Build
-
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-
 import com.youfeng.sfsmod.R
 import com.youfeng.sfsmod.data.MainRepository
 import com.youfeng.sfsmod.utils.vibrate
-
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -38,7 +34,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun startCoroutineOnStart() {
-        if (_state.value is ScreenState.Loading || _state.value is MainViewModel.ScreenState.Done) {
+        if (_state.value is ScreenState.Loading || _state.value is ScreenState.Done) {
             startCoroutine()
         }
     }
@@ -75,9 +71,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     sealed class ScreenState {
-        object Loading : ScreenState()
-        object Stopped : ScreenState()
-        object Done : ScreenState()
+        data object Loading : ScreenState()
+        data object Stopped : ScreenState()
+        data object Done : ScreenState()
         data class Error(val message: String) : ScreenState()
     }
 }

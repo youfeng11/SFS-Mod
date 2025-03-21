@@ -17,13 +17,15 @@ class SignUtil(private val context: Context) {
         fun getPackageInfo(target: String, flags: Int): PackageInfo? = if (isApk) {
                 context.packageManager.getPackageArchiveInfo(target, flags)
             } else {
-                context.packageManager.getPackageInfo(target, flags)
-            }
-        fun getPackageInfo(target: String, flags: PackageManager.PackageInfoFlags): PackageInfo? = if (isApk) {
+            context.packageManager.getPackageInfo(target, flags)
+        }
+        fun getPackageInfo(target: String, flags: PackageManager.PackageInfoFlags): PackageInfo? {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) if (isApk) {
                 context.packageManager.getPackageArchiveInfo(target, flags)
             } else {
                 context.packageManager.getPackageInfo(target, flags)
-            }
+            } else null
+        }
 
         @Suppress("DEPRECATION")
         return when {

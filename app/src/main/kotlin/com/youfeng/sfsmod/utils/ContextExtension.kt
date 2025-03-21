@@ -3,17 +3,14 @@ package com.youfeng.sfsmod.utils
 import android.content.Context
 import android.os.Build
 import android.os.VibrationEffect
-import android.os.VibratorManager
 import android.os.Vibrator
-
-import kotlinx.coroutines.withContext
+import android.os.VibratorManager
 import kotlinx.coroutines.Dispatchers
-
-import okio.sink
-import okio.source
-import okio.buffer
+import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path
+import okio.buffer
+import okio.source
 
 fun Context.vibrate(time: Long = 250) {
     val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

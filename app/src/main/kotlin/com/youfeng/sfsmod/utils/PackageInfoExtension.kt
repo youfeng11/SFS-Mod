@@ -1,17 +1,16 @@
 package com.youfeng.sfsmod.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
-import android.os.Build
 import android.net.Uri
-
+import android.os.Build
 import androidx.core.content.FileProvider
-
+import okio.Path
 import java.io.File
 
-import okio.Path
-
+@SuppressLint("NewApi")
 @Suppress("DEPRECATION")
 fun PackageInfo.signatureMD5(isOld: Boolean = false): String? = if (!isOld) signingInfo?.apkContentsSigners?.firstOrNull()?.toByteArray()?.md5() else signatures?.firstOrNull()?.toByteArray()?.md5()
 

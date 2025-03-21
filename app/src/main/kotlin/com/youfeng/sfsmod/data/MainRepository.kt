@@ -1,10 +1,8 @@
 package com.youfeng.sfsmod.data
 
 import android.content.Context
-import android.os.Build
 
 import com.youfeng.sfsmod.BuildConfig
-import com.youfeng.sfsmod.R
 import com.youfeng.sfsmod.utils.SignUtil
 import com.youfeng.sfsmod.utils.copyAssetFile
 import com.youfeng.sfsmod.utils.installApk
@@ -21,7 +19,7 @@ class MainRepository(private val context: Context) {
     private val fileSystem = FileSystem.SYSTEM
 
     suspend fun copyResources(): Int = withContext(Dispatchers.IO) {
-        val dataPath = "${context.dataDir.absolutePath}/shared_prefs/".toPath()
+        val dataPath = "${context.filesDir.parent}/shared_prefs/".toPath()
         val languagePath = context.getExternalFilesDir("Custom Translations")?.absolutePath?.toPath()
         val externalCachePath = context.externalCacheDir?.absolutePath?.toPath()
 
