@@ -47,7 +47,7 @@ fun MainTheme(
     val view = LocalView.current
     SideEffect {
         val window = (view.context as Activity).window
-        
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
             window.attributes.layoutInDisplayCutoutMode =
@@ -55,7 +55,7 @@ fun MainTheme(
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        WindowCompat.getInsetsController(window,window.decorView)
+        WindowCompat.getInsetsController(window, window.decorView)
 
         @Suppress("DEPRECATION")
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
@@ -69,8 +69,9 @@ fun MainTheme(
 
         WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars =
             !darkTheme
-            
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced = false
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced =
+            false
     }
 
     // 使用 MaterialTheme 包裹 UI 内容

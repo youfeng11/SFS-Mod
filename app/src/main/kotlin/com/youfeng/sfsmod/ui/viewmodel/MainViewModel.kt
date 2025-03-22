@@ -1,16 +1,9 @@
 package com.youfeng.sfsmod.ui.viewmodel
 
-import android.content.Context
-import android.os.Build
 import androidx.lifecycle.ViewModel
-import com.youfeng.sfsmod.R
-import com.youfeng.sfsmod.data.GET_SIGNATURE_MISMATCH
-import com.youfeng.sfsmod.data.GET_SIGNATURE_UNAVAILABLE
-import com.youfeng.sfsmod.data.GET_SIGNATURE_VALID
+import com.youfeng.sfsmod.data.VerifySignatureStates
 import com.youfeng.sfsmod.data.MainRepository
-import com.youfeng.sfsmod.utils.vibrate
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -19,15 +12,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val repository: MainRepository
+    val repository: MainRepository
 ) : ViewModel() {
+
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
@@ -36,8 +32,6 @@ class MainViewModel @Inject constructor(
 
     private val _timer = MutableStateFlow(3)
     val timer: StateFlow<Int> = _timer
-
-    val finishEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     fun setStoppedState() {
         _state.update { ScreenState.Stopped }
@@ -55,7 +49,7 @@ class MainViewModel @Inject constructor(
         _state.update { ScreenState.Loading }
         coroutineScope.launch {
             val result = repository.copyResources()
-            context.vibrate()
+            _uiEvent.emit(UiEvent.Vibrate)
             handleCopyResult(result)
         }
     }
@@ -64,27 +58,20 @@ class MainViewModel @Inject constructor(
         coroutineScope.coroutineContext.cancelChildren()
     }
 
-    private suspend fun handleCopyResult(result: Int) {
+    private suspend fun handleCopyResult(result: VerifySignatureStates) {
         when (result) {
-            GET_SIGNATURE_VALID -> {
+            is VerifySignatureStates.SignatureValid -> {
                 _state.update { ScreenState.Done }
                 for (i in 3 downTo 0) {
                     _timer.update { i }
                     delay(1000)
                 }
-                repository.installApk()
-                finishEvent.emit(Unit)
+                _uiEvent.emit(UiEvent.NavigateToApkInstall)
+                _uiEvent.emit(UiEvent.Finish)
             }
 
-            GET_SIGNATURE_MISMATCH -> _state.update { ScreenState.Error(context.getString(R.string.error_sign)) }
-            GET_SIGNATURE_UNAVAILABLE -> _state.update {
-                ScreenState.Error(
-                    context.getString(
-                        R.string.error_none,
-                        "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
-                    )
-                )
-            }
+            is VerifySignatureStates.SignatureMismatch -> _state.update { ScreenState.Error(ErrorType.SignatureMismatch) }
+            is VerifySignatureStates.SignatureUnavailable -> _state.update { ScreenState.Error(ErrorType.SignatureUnavailable) }
         }
     }
 
@@ -92,6 +79,17 @@ class MainViewModel @Inject constructor(
         data object Loading : ScreenState()
         data object Stopped : ScreenState()
         data object Done : ScreenState()
-        data class Error(val message: String) : ScreenState()
+        data class Error(val errorType: ErrorType) : ScreenState() // 使用 ErrorType 代替 String
+    }
+
+    sealed class ErrorType {
+        data object SignatureMismatch : ErrorType()
+        data object SignatureUnavailable : ErrorType()
+    }
+
+    sealed class UiEvent {
+        data object NavigateToApkInstall : UiEvent()
+        data object Vibrate : UiEvent()
+        data object Finish : UiEvent()
     }
 }

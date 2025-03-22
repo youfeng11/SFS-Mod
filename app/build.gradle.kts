@@ -119,10 +119,10 @@ dependencies {
 
     implementation(libs.androidx.lifecycle)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    
+
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    
+
     implementation(libs.androidx.hilt.navigation.compose)
 
     implementation(libs.androidx.core)

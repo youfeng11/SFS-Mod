@@ -8,10 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-
-import com.youfeng.sfsmod.R
-
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
+import com.youfeng.sfsmod.R
 
 @Composable
 fun CreditsDialog(onDismissRequest: () -> Unit) {
@@ -27,6 +25,6 @@ fun CreditsDialog(onDismissRequest: () -> Unit) {
 
 @Preview
 @Composable
-fun CreditsDialogPreview() {
-    CreditsDialog{}
+private fun CreditsDialogPreview() {
+    CreditsDialog {}
 }

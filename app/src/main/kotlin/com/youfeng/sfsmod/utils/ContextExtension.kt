@@ -27,7 +27,8 @@ fun Context.vibrate(time: Long = 250) {
     }
 }
 
-suspend fun Context.copyAssetFile(assetFileName: String, destinationPath: Path) = withContext(Dispatchers.IO) {
+suspend fun Context.copyAssetFile(assetFileName: String, destinationPath: Path) =
+    withContext(Dispatchers.IO) {
         assets.open(assetFileName).source().buffer().use { src ->
             FileSystem.SYSTEM.sink(destinationPath).buffer().use { dst ->
                 src.readAll(dst)

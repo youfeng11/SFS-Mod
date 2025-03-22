@@ -54,7 +54,7 @@ fun AboutDialog(htmlString: String, onDismissRequest: () -> Unit) {
                             fontSize = 18.sp
                         )
                         SelectionContainer {
-                        Text(
+                            Text(
                                 "v${BuildConfig.VERSION_NAME}（${BuildConfig.VERSION_CODE}）",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -99,6 +99,6 @@ fun AnnotatedLinkText(htmlString: String) {
 
 @Preview
 @Composable
-fun AboutDialogPreview() {
+private fun AboutDialogPreview() {
     AboutDialog(stringResource(R.string.about_source_code)) { }
 }

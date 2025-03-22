@@ -1,5 +1,6 @@
 package com.youfeng.sfsmod.ui.screen
 
+import android.os.Build
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
@@ -18,18 +19,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.outlined.ContactPage
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -40,15 +33,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -59,9 +47,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.R
-import com.youfeng.sfsmod.ui.component.AboutDialog
-import com.youfeng.sfsmod.ui.component.CreditsDialog
+import com.youfeng.sfsmod.ui.component.OverflowMenu
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
+import com.youfeng.sfsmod.utils.vibrate
 
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
@@ -79,9 +67,19 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     }
 
     val context = LocalActivity.current
-    LaunchedEffect(Unit) {
-        viewModel.finishEvent.collect {
-            context?.finish()
+    LaunchedEffect(viewModel) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is MainViewModel.UiEvent.NavigateToApkInstall -> {
+                    viewModel.repository.installApk()
+                }
+                is MainViewModel.UiEvent.Vibrate -> {
+                    context?.vibrate()
+                }
+                is MainViewModel.UiEvent.Finish -> {
+                    context?.finish()
+                }
+            }
         }
     }
 
@@ -92,7 +90,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainLayout(viewModel: MainViewModel) {
+private fun MainLayout(viewModel: MainViewModel) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -114,7 +112,7 @@ fun MainLayout(viewModel: MainViewModel) {
 }
 
 @Composable
-fun ContentArea(modifier: Modifier = Modifier, viewModel: MainViewModel) {
+private fun ContentArea(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -130,7 +128,7 @@ fun ContentArea(modifier: Modifier = Modifier, viewModel: MainViewModel) {
 }
 
 @Composable
-fun VersionInfo() {
+private fun VersionInfo() {
     val versionText = remember {
         "v${BuildConfig.VERSION_NAME.substringBefore("-")}（${BuildConfig.VERSION_CODE}）"
     }
@@ -138,7 +136,7 @@ fun VersionInfo() {
 }
 
 @Composable
-fun LoadingSection(viewModel: MainViewModel) {
+private fun LoadingSection(viewModel: MainViewModel) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         AnimatedContent(
             targetState = viewModel.state.collectAsState().value,
@@ -157,7 +155,14 @@ fun LoadingSection(viewModel: MainViewModel) {
                     viewModel.timer.collectAsState().value
                 )
 
-                is MainViewModel.ScreenState.Error -> (viewModel.state.collectAsState().value as MainViewModel.ScreenState.Error).message
+                is MainViewModel.ScreenState.Error -> when ((viewModel.state.collectAsState().value as MainViewModel.ScreenState.Error).errorType) {
+                    is MainViewModel.ErrorType.SignatureMismatch -> stringResource(R.string.error_sign)
+                    is MainViewModel.ErrorType.SignatureUnavailable -> stringResource(
+                        R.string.error_none,
+                        "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
+                    )
+                }
+
                 else -> stringResource(R.string.loading)
             },
             style = MaterialTheme.typography.bodyLarge,
@@ -171,7 +176,7 @@ fun LoadingSection(viewModel: MainViewModel) {
 }
 
 @Composable
-fun LoadingIcon(state: MainViewModel.ScreenState) {
+private fun LoadingIcon(state: MainViewModel.ScreenState) {
     val iconData = when (state) {
         is MainViewModel.ScreenState.Stopped -> Icons.Filled.Close to MaterialTheme.colorScheme.primary
         is MainViewModel.ScreenState.Done -> Icons.Filled.Done to MaterialTheme.colorScheme.primary
@@ -190,60 +195,5 @@ fun LoadingIcon(state: MainViewModel.ScreenState) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-    )
-}
-
-@Composable
-private fun OverflowMenu(viewModel: MainViewModel) {
-    var menuExpanded by rememberSaveable { mutableStateOf(false) }
-    var openAboutDialog by rememberSaveable { mutableStateOf(false) }
-    var openCreditsDialog by rememberSaveable { mutableStateOf(false) }
-
-    IconButton(onClick = { menuExpanded = true }) {
-        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.more_vert))
-    }
-
-    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-        AnimatedContent(
-            targetState = viewModel.state.collectAsState().value is MainViewModel.ScreenState.Loading || viewModel.state.collectAsState().value is MainViewModel.ScreenState.Done,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
-            }
-        ) { isRunning ->
-            MenuItem(
-                text = stringResource(if (isRunning) R.string.menu_stop else R.string.menu_refresh),
-                icon = if (isRunning) Icons.Filled.Close else Icons.Filled.Refresh
-            ) {
-                menuExpanded = false
-                viewModel.stopCoroutine()
-                if (isRunning) viewModel.setStoppedState() else viewModel.startCoroutine()
-            }
-        }
-
-        HorizontalDivider()
-
-        MenuItem(stringResource(R.string.menu_about), Icons.Outlined.Info) {
-            menuExpanded = false
-            openAboutDialog = true
-        }
-
-        MenuItem(stringResource(R.string.menu_credits), Icons.Outlined.ContactPage) {
-            menuExpanded = false
-            openCreditsDialog = true
-        }
-    }
-
-    if (openAboutDialog) AboutDialog(stringResource(R.string.about_source_code)) {
-        openAboutDialog = false
-    }
-    if (openCreditsDialog) CreditsDialog { openCreditsDialog = false }
-}
-
-@Composable
-fun MenuItem(text: String, icon: ImageVector, onClick: () -> Unit) {
-    DropdownMenuItem(
-        text = { Text(text) },
-        leadingIcon = { Icon(icon, contentDescription = null) },
-        onClick = onClick
     )
 }

@@ -12,7 +12,9 @@ import java.io.File
 
 @SuppressLint("NewApi")
 @Suppress("DEPRECATION")
-fun PackageInfo.signatureMD5(isOld: Boolean = false): String? = if (!isOld) signingInfo?.apkContentsSigners?.firstOrNull()?.toByteArray()?.md5() else signatures?.firstOrNull()?.toByteArray()?.md5()
+fun PackageInfo.signatureMD5(isOld: Boolean = false): String? =
+    if (!isOld) signingInfo?.apkContentsSigners?.firstOrNull()?.toByteArray()
+        ?.md5() else signatures?.firstOrNull()?.toByteArray()?.md5()
 
 fun Context.installApk(apkPath: Path) {
     val apkFile = File(apkPath.toString()) // 仍然需要转换为 File

@@ -1,24 +1,23 @@
 package com.youfeng.sfsmod.data
 
 import android.content.Context
-
 import com.youfeng.sfsmod.utils.SignUtil
 import com.youfeng.sfsmod.utils.copyAssetFile
 import com.youfeng.sfsmod.utils.installApk
 import dagger.hilt.android.qualifiers.ApplicationContext
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 import javax.inject.Inject
 import javax.inject.Singleton
 
-const val GET_SIGNATURE_UNAVAILABLE = 0
-const val GET_SIGNATURE_VALID = 1
-const val GET_SIGNATURE_MISMATCH = 2
+sealed class VerifySignatureStates {
+    data object SignatureValid : VerifySignatureStates()
+    data object SignatureMismatch : VerifySignatureStates()
+    data object SignatureUnavailable : VerifySignatureStates()
+}
 
 @Singleton
 class MainRepository @Inject constructor(
@@ -26,7 +25,7 @@ class MainRepository @Inject constructor(
 ) {
     private val fileSystem = FileSystem.SYSTEM
 
-    suspend fun copyResources(): Int = withContext(Dispatchers.IO) {
+    suspend fun copyResources(): VerifySignatureStates = withContext(Dispatchers.IO) {
         val dataPath = "${context.filesDir.parent}/shared_prefs/".toPath()
         val languagePath =
             context.getExternalFilesDir("Custom Translations")?.absolutePath?.toPath()
@@ -46,15 +45,15 @@ class MainRepository @Inject constructor(
         return@withContext verifySignature(externalCachePath)
     }
 
-    private fun verifySignature(externalCachePath: Path?): Int {
-        externalCachePath ?: return GET_SIGNATURE_UNAVAILABLE
+    private fun verifySignature(externalCachePath: Path?): VerifySignatureStates {
+        externalCachePath ?: return VerifySignatureStates.SignatureUnavailable
         val signUtil = SignUtil(context)
         val thisMD5 = signUtil.getCurrentAppSignatureMD5()
         val apkMD5 = signUtil.getApkSignatureMD5(externalCachePath.resolve("temp.apk").toString())
         return when {
-            thisMD5.isNullOrEmpty() || apkMD5.isNullOrEmpty() -> GET_SIGNATURE_UNAVAILABLE
-            thisMD5 == apkMD5 -> GET_SIGNATURE_VALID
-            else -> GET_SIGNATURE_MISMATCH
+            thisMD5.isNullOrEmpty() || apkMD5.isNullOrEmpty() -> VerifySignatureStates.SignatureUnavailable
+            thisMD5 == apkMD5 -> VerifySignatureStates.SignatureValid
+            else -> VerifySignatureStates.SignatureMismatch
         }
     }
 
