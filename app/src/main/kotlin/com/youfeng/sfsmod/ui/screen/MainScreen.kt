@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,46 +52,67 @@ import com.youfeng.sfsmod.ui.component.OverflowMenu
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 import com.youfeng.sfsmod.utils.vibrate
 
+/**
+ * 主界面入口，实现：
+ * 1. 生命周期绑定（启动/停止协程）
+ * 2. UI事件监听（振动、安装导航、退出）
+ * 3. 整体布局容器
+ *
+ * @param viewModel 通过Hilt自动注入的ViewModel
+ */
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
+    val uiState by viewModel.state.collectAsState()
+    val timer by viewModel.timer.collectAsState()
+
+
+    // region 生命周期管理
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_START -> viewModel.startCoroutineOnStart()
-                Lifecycle.Event.ON_STOP -> viewModel.stopCoroutine()
+                Lifecycle.Event.ON_START -> viewModel.startCoroutineOnStart() // 界面可见时启动流程
+                Lifecycle.Event.ON_STOP -> viewModel.stopCoroutine() // 界面隐藏时停止任务
                 else -> {}
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
+    // endregion
 
+    // region UI事件处理
     val context = LocalActivity.current
     LaunchedEffect(viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is MainViewModel.UiEvent.NavigateToApkInstall -> {
-                    viewModel.repository.installApk()
-                }
-                is MainViewModel.UiEvent.Vibrate -> {
-                    context?.vibrate()
-                }
                 is MainViewModel.UiEvent.Finish -> {
-                    context?.finish()
+                    context?.finish() // 关闭当前Activity
+                }
+
+                is MainViewModel.UiEvent.Vibrate -> {
+                    context?.vibrate() // 短振动反馈
                 }
             }
         }
     }
+    // endregion
 
+    // 基础布局容器
     Surface(modifier = Modifier.fillMaxSize()) {
-        MainLayout(viewModel)
+        MainLayout(viewModel, uiState, timer)
     }
 }
 
+/**
+ * 主界面布局结构
+ * 包含：
+ * - 顶部应用栏（标题+菜单）
+ * - 内容区域（版本信息、加载状态、警告文本）
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MainLayout(viewModel: MainViewModel) {
+private fun MainLayout(viewModel: MainViewModel, uiState: MainViewModel.ScreenState, timer: Int) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -98,28 +120,40 @@ private fun MainLayout(viewModel: MainViewModel) {
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.topbar_title)) },
-                actions = { OverflowMenu(viewModel) },
+                actions = { OverflowMenu(viewModel, uiState) }, // 右上角菜单按钮
                 scrollBehavior = scrollBehavior
             )
         },
-        contentWindowInsets = WindowInsets.safeDrawing
+        contentWindowInsets = WindowInsets.safeDrawing // 适配全面屏
     ) { innerPadding ->
         ContentArea(
             modifier = Modifier.padding(innerPadding),
-            viewModel = viewModel
+            uiState = uiState,
+            timer = timer
         )
     }
 }
 
+/**
+ * 内容区域组合
+ * 垂直排列三个部分：
+ * 1. 版本信息（顶部）
+ * 2. 加载状态指示器（中部）
+ * 3. 警告文本（底部）
+ */
 @Composable
-private fun ContentArea(modifier: Modifier = Modifier, viewModel: MainViewModel) {
+private fun ContentArea(
+    modifier: Modifier = Modifier,
+    uiState: MainViewModel.ScreenState,
+    timer: Int
+) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         VersionInfo()
-        LoadingSection(viewModel)
+        LoadingSection(uiState, timer)
         Text(
             text = stringResource(R.string.warnning),
             style = MaterialTheme.typography.bodyMedium
@@ -127,6 +161,10 @@ private fun ContentArea(modifier: Modifier = Modifier, viewModel: MainViewModel)
     }
 }
 
+/**
+ * 显示应用版本信息
+ * 格式示例："v2.1.0（210）"
+ */
 @Composable
 private fun VersionInfo() {
     val versionText = remember {
@@ -135,27 +173,35 @@ private fun VersionInfo() {
     Text(text = versionText, style = MaterialTheme.typography.titleMedium)
 }
 
+/**
+ * 动态加载状态显示区域
+ * 包含：
+ * - 图标/进度条动画切换
+ * - 状态文本描述
+ */
 @Composable
-private fun LoadingSection(viewModel: MainViewModel) {
+private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        // 状态图标动画（淡入淡出300ms）
         AnimatedContent(
-            targetState = viewModel.state.collectAsState().value,
+            targetState = uiState,
             transitionSpec = {
                 fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
             }
         ) { state -> LoadingIcon(state) }
 
+        // 动态文本（自动调整布局大小）
         Text(
             modifier = Modifier.animateContentSize(),
             textAlign = TextAlign.Center,
-            text = when (viewModel.state.collectAsState().value) {
+            text = when (uiState) {
                 is MainViewModel.ScreenState.Stopped -> stringResource(R.string.stopped)
                 is MainViewModel.ScreenState.Done -> stringResource(
                     R.string.done,
-                    viewModel.timer.collectAsState().value
+                    timer
                 )
 
-                is MainViewModel.ScreenState.Error -> when ((viewModel.state.collectAsState().value as MainViewModel.ScreenState.Error).errorType) {
+                is MainViewModel.ScreenState.Error -> when (uiState.errorType) {
                     is MainViewModel.ErrorType.SignatureMismatch -> stringResource(R.string.error_sign)
                     is MainViewModel.ErrorType.SignatureUnavailable -> stringResource(
                         R.string.error_none,
@@ -166,15 +212,22 @@ private fun LoadingSection(viewModel: MainViewModel) {
                 else -> stringResource(R.string.loading)
             },
             style = MaterialTheme.typography.bodyLarge,
-            color = when (viewModel.state.collectAsState().value) {
+            color = when (uiState) {
                 is MainViewModel.ScreenState.Loading -> Color.Unspecified
-                is MainViewModel.ScreenState.Error -> MaterialTheme.colorScheme.error
-                else -> MaterialTheme.colorScheme.primary
+                is MainViewModel.ScreenState.Error -> MaterialTheme.colorScheme.error // 错误状态显示红色
+                else -> MaterialTheme.colorScheme.primary // 其他状态显示主题色
             }
         )
     }
 }
 
+/**
+ * 状态指示图标组件
+ * @param state 当前界面状态
+ * 显示规则：
+ * - 完成/停止/错误状态：显示对应图标
+ * - 加载中：显示进度条
+ */
 @Composable
 private fun LoadingIcon(state: MainViewModel.ScreenState) {
     val iconData = when (state) {
@@ -191,7 +244,7 @@ private fun LoadingIcon(state: MainViewModel.ScreenState) {
             contentDescription = null,
             tint = tint
         )
-    } ?: LinearProgressIndicator(
+    } ?: LinearProgressIndicator( // 加载中显示进度条
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)

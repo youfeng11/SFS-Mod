@@ -30,7 +30,15 @@ import androidx.compose.ui.unit.sp
 import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.R
 
-// 关于对话框
+/**
+ * 关于对话框
+ * @param htmlString 包含HTML链接的富文本
+ * @param onDismissRequest 关闭对话框回调
+ * 布局结构：
+ * - 应用图标和版本信息
+ * - 可选择的版本号文本
+ * - 支持超链接的说明文本
+ */
 @Composable
 fun AboutDialog(htmlString: String, onDismissRequest: () -> Unit) {
     AlertDialog(
@@ -38,21 +46,26 @@ fun AboutDialog(htmlString: String, onDismissRequest: () -> Unit) {
         confirmButton = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row {
+                    // 应用图标显示
                     Image(
                         painter = painterResource(id = R.mipmap.ic_launcher),
                         contentDescription = null,
                         modifier = Modifier
                             .size(44.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(12.dp)) // 圆角裁剪
                     )
                     Spacer(Modifier.width(18.dp))
+
                     Column {
+                        // 应用名称
                         Text(
                             stringResource(id = R.string.app_name),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 18.sp
                         )
+
+                        // 可选中的版本号
                         SelectionContainer {
                             Text(
                                 "v${BuildConfig.VERSION_NAME}（${BuildConfig.VERSION_CODE}）",
@@ -61,7 +74,10 @@ fun AboutDialog(htmlString: String, onDismissRequest: () -> Unit) {
                                 fontSize = 14.sp
                             )
                         }
+
                         Spacer(Modifier.height(18.dp))
+
+                        // 富文本链接
                         AnnotatedLinkText(htmlString)
                     }
                 }
@@ -70,7 +86,14 @@ fun AboutDialog(htmlString: String, onDismissRequest: () -> Unit) {
     )
 }
 
-// 富文本链接
+/**
+ * HTML链接文本解析器
+ * @param htmlString 包含<a>标签的HTML字符串
+ * 特性：
+ * - 链接显示为带下划线的主题色
+ * - 按压状态有背景高亮
+ * - 自动解析HTML实体
+ */
 @Composable
 fun AnnotatedLinkText(htmlString: String) {
     val annotatedString = AnnotatedString.fromHtml(
@@ -79,13 +102,13 @@ fun AnnotatedLinkText(htmlString: String) {
             style = SpanStyle(
                 color = MaterialTheme.colorScheme.primary,
                 textDecoration = TextDecoration.Underline,
-                fontWeight = FontWeight.Bold // 设置粗体
+                fontWeight = FontWeight.Bold
             ),
             pressedStyle = SpanStyle(
                 color = MaterialTheme.colorScheme.primary,
                 background = MaterialTheme.colorScheme.secondaryContainer,
                 textDecoration = TextDecoration.Underline,
-                fontWeight = FontWeight.Bold // 设置粗体
+                fontWeight = FontWeight.Bold
             )
         )
     )

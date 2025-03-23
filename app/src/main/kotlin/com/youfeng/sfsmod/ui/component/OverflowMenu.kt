@@ -18,7 +18,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -28,19 +27,38 @@ import androidx.compose.ui.res.stringResource
 import com.youfeng.sfsmod.R
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 
+/**
+ * 右上角溢出菜单组件
+ * @param viewModel 用于控制业务流程状态
+ * 功能特性：
+ * - 动态切换"停止/刷新"按钮状态
+ * - 显示关于和开源许可对话框
+ * - 300ms淡入淡出动效
+ */
 @Composable
-fun OverflowMenu(viewModel: MainViewModel) {
+fun OverflowMenu(viewModel: MainViewModel, uiState: MainViewModel.ScreenState) {
+    // region 状态管理
     var menuExpanded by rememberSaveable { mutableStateOf(false) }
     var openAboutDialog by rememberSaveable { mutableStateOf(false) }
     var openCreditsDialog by rememberSaveable { mutableStateOf(false) }
+    // endregion
 
+    // 菜单触发按钮
     IconButton(onClick = { menuExpanded = true }) {
-        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.more_vert))
+        Icon(
+            Icons.Filled.MoreVert,
+            contentDescription = stringResource(R.string.more_vert) // 无障碍描述
+        )
     }
 
-    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+    DropdownMenu(
+        expanded = menuExpanded,
+        onDismissRequest = { menuExpanded = false }
+    ) {
+        // 动态切换的操作项
         AnimatedContent(
-            targetState = viewModel.state.collectAsState().value is MainViewModel.ScreenState.Loading || viewModel.state.collectAsState().value is MainViewModel.ScreenState.Done,
+            targetState = uiState is MainViewModel.ScreenState.Loading
+                    || uiState is MainViewModel.ScreenState.Done,
             transitionSpec = {
                 fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
             }
@@ -57,8 +75,9 @@ fun OverflowMenu(viewModel: MainViewModel) {
             }
         }
 
-        HorizontalDivider()
+        HorizontalDivider() // 菜单项分隔线
 
+        // 静态菜单项
         MenuItem(stringResource(R.string.menu_about), Icons.Outlined.Info) {
             menuExpanded = false
             openAboutDialog = true
@@ -70,12 +89,19 @@ fun OverflowMenu(viewModel: MainViewModel) {
         }
     }
 
+    // 对话框控制
     if (openAboutDialog) AboutDialog(stringResource(R.string.about_source_code)) {
         openAboutDialog = false
     }
     if (openCreditsDialog) CreditsDialog { openCreditsDialog = false }
 }
 
+/**
+ * 通用菜单项组件
+ * @param text 菜单项显示文本
+ * @param icon 左侧图标资源
+ * @param onClick 点击回调
+ */
 @Composable
 private fun MenuItem(text: String, icon: ImageVector, onClick: () -> Unit) {
     DropdownMenuItem(

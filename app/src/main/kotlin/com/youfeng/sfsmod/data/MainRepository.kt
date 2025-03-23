@@ -1,12 +1,9 @@
 package com.youfeng.sfsmod.data
 
 import android.content.Context
-import com.youfeng.sfsmod.utils.SignUtil
 import com.youfeng.sfsmod.utils.copyAssetFile
 import com.youfeng.sfsmod.utils.installApk
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -19,22 +16,31 @@ sealed class VerifySignatureStates {
     data object SignatureUnavailable : VerifySignatureStates()
 }
 
+/**
+ * 数据仓库，负责文件操作，不再包含业务逻辑
+ */
 @Singleton
 class MainRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val fileSystem = FileSystem.SYSTEM
 
-    suspend fun copyResources(): VerifySignatureStates = withContext(Dispatchers.IO) {
+    /**
+     * 复制资源文件
+     * @return APK 临时文件路径
+     */
+    suspend fun copyResources(): Path? {
         val dataPath = "${context.filesDir.parent}/shared_prefs/".toPath()
         val languagePath =
             context.getExternalFilesDir("Custom Translations")?.absolutePath?.toPath()
         val externalCachePath = context.externalCacheDir?.absolutePath?.toPath()
 
+        // 创建目录
         listOfNotNull(dataPath, languagePath, externalCachePath).forEach {
             fileSystem.createDirectories(it)
         }
 
+        // 复制资源文件
         context.copyAssetFile(
             "mod.xml",
             dataPath.resolve("com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml")
@@ -42,21 +48,12 @@ class MainRepository @Inject constructor(
         languagePath?.let { context.copyAssetFile("translation.txt", it.resolve("简体中文.txt")) }
         externalCachePath?.let { context.copyAssetFile("base.apk.1", it.resolve("temp.apk")) }
 
-        return@withContext verifySignature(externalCachePath)
+        return externalCachePath
     }
 
-    private fun verifySignature(externalCachePath: Path?): VerifySignatureStates {
-        externalCachePath ?: return VerifySignatureStates.SignatureUnavailable
-        val signUtil = SignUtil(context)
-        val thisMD5 = signUtil.getCurrentAppSignatureMD5()
-        val apkMD5 = signUtil.getApkSignatureMD5(externalCachePath.resolve("temp.apk").toString())
-        return when {
-            thisMD5.isNullOrEmpty() || apkMD5.isNullOrEmpty() -> VerifySignatureStates.SignatureUnavailable
-            thisMD5 == apkMD5 -> VerifySignatureStates.SignatureValid
-            else -> VerifySignatureStates.SignatureMismatch
-        }
-    }
-
+    /**
+     * 安装 APK
+     */
     fun installApk() {
         context.externalCacheDir?.absolutePath?.toPath()?.resolve("temp.apk")
             ?.let { context.installApk(it) }
