@@ -1,9 +1,9 @@
 package com.youfeng.sfsmod.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.youfeng.sfsmod.data.MainRepository
 import com.youfeng.sfsmod.data.VerifySignatureStates
 import com.youfeng.sfsmod.domain.usecase.CopyResourcesUseCase
-import com.youfeng.sfsmod.domain.usecase.InstallApkUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,8 +30,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val copyResourcesUseCase: CopyResourcesUseCase,
-    private val installApkUseCase: InstallApkUseCase
+    private val repository: MainRepository,
+    private val copyResourcesUseCase: CopyResourcesUseCase
 ) : ViewModel() {
 
     // region 事件流配置
@@ -135,7 +135,7 @@ class MainViewModel @Inject constructor(
                     _timer.update { i }
                     delay(1000)
                 }
-                installApkUseCase()
+                repository.installApk()
                 _uiEvent.emit(UiEvent.Finish)
             }
 
