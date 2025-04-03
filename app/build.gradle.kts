@@ -9,7 +9,6 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.compose.compiler)
-    id("kotlin-parcelize")
     alias(libs.plugins.aboutlibraries)
 }
 
