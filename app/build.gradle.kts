@@ -113,23 +113,23 @@ android {
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
 
+    implementation(libs.androidx.activity.compose)
+
     implementation(libs.compose.material3)
+    implementation(libs.compose.materialIcons)
     implementation(libs.compose.uiToolingPreview)
+    implementation(libs.androidx.core)
+    implementation(libs.compose.ui)
 
     implementation(libs.androidx.lifecycle)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
 
-    implementation(libs.androidx.hilt.navigation.compose)
-
-    implementation(libs.androidx.core)
-    implementation(libs.compose.ui)
-    implementation(libs.androidx.activity.compose)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.compose.uiTooling)
-    implementation(libs.compose.materialIcons)
 
     implementation(libs.about.libraries.core)
     implementation(libs.about.libraries.ui)

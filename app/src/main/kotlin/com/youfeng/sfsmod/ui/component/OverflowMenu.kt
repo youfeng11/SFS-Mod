@@ -20,7 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -38,9 +38,9 @@ import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 @Composable
 fun OverflowMenu(viewModel: MainViewModel, uiState: MainViewModel.ScreenState) {
     // region 状态管理
-    var menuExpanded by rememberSaveable { mutableStateOf(false) }
-    var openAboutDialog by rememberSaveable { mutableStateOf(false) }
-    var openCreditsDialog by rememberSaveable { mutableStateOf(false) }
+    var menuExpanded by remember { mutableStateOf(false) }
+    var openAboutDialog by remember { mutableStateOf(false) }
+    var openCreditsDialog by remember { mutableStateOf(false) }
     // endregion
 
     // 菜单触发按钮

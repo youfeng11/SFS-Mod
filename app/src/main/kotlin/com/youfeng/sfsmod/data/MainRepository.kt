@@ -10,10 +10,13 @@ import okio.Path.Companion.toPath
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 sealed class VerifySignatureStates {
     data object SignatureValid : VerifySignatureStates()
     data object SignatureMismatch : VerifySignatureStates()
-    data object SignatureUnavailable : VerifySignatureStates()
+    data object SignatureUnavailablePathIsNull : VerifySignatureStates()
+    data object SignatureUnavailableThis : VerifySignatureStates()
+    data object SignatureUnavailableApk : VerifySignatureStates()
 }
 
 /**

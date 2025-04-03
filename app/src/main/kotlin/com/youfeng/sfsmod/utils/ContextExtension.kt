@@ -1,16 +1,20 @@
 package com.youfeng.sfsmod.utils
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path
 import okio.buffer
 import okio.source
+import java.io.File
 
 /**
  * 触发设备振动。
@@ -51,3 +55,18 @@ suspend fun Context.copyAssetFile(assetFileName: String, destinationPath: Path) 
             }
         }
     }
+
+
+fun Context.installApk(apkPath: Path) {
+    val apkFile = File(apkPath.toString()) // 转换为File对象以兼容系统API
+    val apkUri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        FileProvider.getUriForFile(this, "$packageName.provider", apkFile)
+    } else {
+        Uri.fromFile(apkFile)
+    }
+
+    Intent(Intent.ACTION_VIEW).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        setDataAndType(apkUri, "application/vnd.android.package-archive")
+    }.also { startActivity(it) }
+}

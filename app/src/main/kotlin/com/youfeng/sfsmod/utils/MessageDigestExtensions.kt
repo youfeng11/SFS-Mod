@@ -4,11 +4,11 @@ import okio.ByteString
 import okio.ByteString.Companion.toByteString
 
 /**
- * 将字节数组转换为MD5哈希字符串。
+ * 将字节数组转换为SHA-256哈希字符串。
  * 使用Okio库的ByteString进行中间转换以提高性能。
- * @return 32位小写MD5字符串，如 "d41d8cd98f00b204e9800998ecf8427e"
+ * @return SHA-256的小写字符串
  */
-fun ByteArray.md5(): String = toByteString().md5().toHex()
+fun ByteArray.sha256(): String = toByteString().sha256().toHex()
 
 /**
  * 将字节数组转换为十六进制字符串。

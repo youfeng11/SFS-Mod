@@ -67,18 +67,11 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 
 
     // region 生命周期管理
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_START -> viewModel.startCoroutineOnStart() // 界面可见时启动流程
-                Lifecycle.Event.ON_STOP -> viewModel.stopCoroutine() // 界面隐藏时停止任务
-                else -> {}
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
+    // 在 MainScreen 中使用
+    LifecycleAwareHandler(
+        onStart = viewModel::startCoroutineOnStart,
+        onStop = viewModel::stopCoroutine
+    )
     // endregion
 
     // region UI事件处理
@@ -101,6 +94,26 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     // 基础布局容器
     Surface(modifier = Modifier.fillMaxSize()) {
         MainLayout(viewModel, uiState, timer)
+    }
+}
+
+// 封装可复用的生命周期观察器
+@Composable
+fun LifecycleAwareHandler(
+    onStart: () -> Unit,
+    onStop: () -> Unit
+) {
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> onStart()
+                Lifecycle.Event.ON_STOP -> onStop()
+                else -> {}
+            }
+        }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
     }
 }
 
@@ -155,7 +168,7 @@ private fun ContentArea(
         VersionInfo()
         LoadingSection(uiState, timer)
         Text(
-            text = stringResource(R.string.warnning),
+            text = stringResource(R.string.warning),
             style = MaterialTheme.typography.bodyMedium
         )
     }
@@ -203,8 +216,18 @@ private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
 
                 is MainViewModel.ScreenState.Error -> when (uiState.errorType) {
                     is MainViewModel.ErrorType.SignatureMismatch -> stringResource(R.string.error_sign)
-                    is MainViewModel.ErrorType.SignatureUnavailable -> stringResource(
-                        R.string.error_none,
+                    is MainViewModel.ErrorType.SignatureUnavailablePath -> stringResource(R.string.error_none_path) + stringResource(
+                        R.string.error_none_body,
+                        "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
+                    )
+
+                    is MainViewModel.ErrorType.SignatureUnavailableThis -> stringResource(R.string.error_none_this_signature) + stringResource(
+                        R.string.error_none_body,
+                        "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
+                    )
+
+                    is MainViewModel.ErrorType.SignatureUnavailableApk -> stringResource(R.string.error_none_apk_signature) + stringResource(
+                        R.string.error_none_body,
                         "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
                     )
                 }

@@ -10,11 +10,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,8 +39,8 @@ class MainViewModel @Inject constructor(
      * 一次性UI事件流（如导航、振动）
      * 使用SharedFlow避免重复消费问题
      */
-    private val _uiEvent = MutableSharedFlow<UiEvent>()
-    val uiEvent = _uiEvent.asSharedFlow()
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
     // endregion
 
     // region 协程作用域
@@ -102,7 +102,7 @@ class MainViewModel @Inject constructor(
         _state.update { ScreenState.Loading }
         coroutineScope.launch {
             val result = copyResourcesUseCase()
-            _uiEvent.emit(UiEvent.Vibrate) // 操作完成触发振动反馈
+            _uiEvent.send(UiEvent.Vibrate) // 操作完成触发振动反馈
             handleCopyResult(result)
         }
     }
@@ -136,7 +136,7 @@ class MainViewModel @Inject constructor(
                     delay(1000)
                 }
                 repository.installApk()
-                _uiEvent.emit(UiEvent.Finish)
+                _uiEvent.send(UiEvent.Finish)
             }
 
             is VerifySignatureStates.SignatureMismatch -> _state.update {
@@ -145,9 +145,21 @@ class MainViewModel @Inject constructor(
                 )
             }
 
-            is VerifySignatureStates.SignatureUnavailable -> _state.update {
+            is VerifySignatureStates.SignatureUnavailablePathIsNull -> _state.update {
                 ScreenState.Error(
-                    ErrorType.SignatureUnavailable
+                    ErrorType.SignatureUnavailablePath
+                )
+            }
+
+            is VerifySignatureStates.SignatureUnavailableThis -> _state.update {
+                ScreenState.Error(
+                    ErrorType.SignatureUnavailableThis
+                )
+            }
+
+            is VerifySignatureStates.SignatureUnavailableApk -> _state.update {
+                ScreenState.Error(
+                    ErrorType.SignatureUnavailableApk
                 )
             }
         }
@@ -185,7 +197,11 @@ class MainViewModel @Inject constructor(
         data object SignatureMismatch : ErrorType()
 
         /** 无法获取签名（系统限制） */
-        data object SignatureUnavailable : ErrorType()
+        data object SignatureUnavailablePath : ErrorType()
+
+        data object SignatureUnavailableThis : ErrorType()
+
+        data object SignatureUnavailableApk : ErrorType()
     }
 
     /**
