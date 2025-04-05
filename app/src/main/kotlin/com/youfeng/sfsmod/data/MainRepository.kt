@@ -51,7 +51,7 @@ class MainRepository @Inject constructor(
         languagePath?.let { context.copyAssetFile("translation.txt", it.resolve("简体中文.txt")) }
         externalCachePath?.let { context.copyAssetFile("base.apk.1", it.resolve("temp.apk")) }
 
-        return externalCachePath
+        return externalCachePath?.resolve("temp.apk")
     }
 
     /**

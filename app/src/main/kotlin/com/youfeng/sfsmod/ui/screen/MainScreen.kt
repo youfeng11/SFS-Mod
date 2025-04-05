@@ -203,6 +203,10 @@ private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
             }
         ) { state -> LoadingIcon(state) }
 
+        val errorTextBody = stringResource(
+            R.string.error_none_body,
+            "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
+        )
         // 动态文本（自动调整布局大小）
         Text(
             modifier = Modifier.animateContentSize(),
@@ -216,20 +220,12 @@ private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
 
                 is MainViewModel.ScreenState.Error -> when (uiState.errorType) {
                     is MainViewModel.ErrorType.SignatureMismatch -> stringResource(R.string.error_sign)
-                    is MainViewModel.ErrorType.SignatureUnavailablePath -> stringResource(R.string.error_none_path) + stringResource(
-                        R.string.error_none_body,
-                        "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
-                    )
 
-                    is MainViewModel.ErrorType.SignatureUnavailableThis -> stringResource(R.string.error_none_this_signature) + stringResource(
-                        R.string.error_none_body,
-                        "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
-                    )
+                    is MainViewModel.ErrorType.SignatureUnavailablePath -> "stringResource(R.string.error_none_path)}\n$errorTextBody"
 
-                    is MainViewModel.ErrorType.SignatureUnavailableApk -> stringResource(R.string.error_none_apk_signature) + stringResource(
-                        R.string.error_none_body,
-                        "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
-                    )
+                    is MainViewModel.ErrorType.SignatureUnavailableThis -> "${stringResource(R.string.error_none_this_signature)}\n$errorTextBody"
+
+                    is MainViewModel.ErrorType.SignatureUnavailableApk -> "stringResource(R.string.error_none_apk_signature)}\n$errorTextBody"
                 }
 
                 else -> stringResource(R.string.loading)
