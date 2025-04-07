@@ -169,7 +169,8 @@ private fun ContentArea(
         LoadingSection(uiState, timer)
         Text(
             text = stringResource(R.string.warning),
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -221,11 +222,11 @@ private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
                 is MainViewModel.ScreenState.Error -> when (uiState.errorType) {
                     is MainViewModel.ErrorType.SignatureMismatch -> stringResource(R.string.error_sign)
 
-                    is MainViewModel.ErrorType.SignatureUnavailablePath -> "stringResource(R.string.error_none_path)}\n$errorTextBody"
+                    is MainViewModel.ErrorType.SignatureUnavailablePath -> "${stringResource(R.string.error_none_path)}\n$errorTextBody"
 
                     is MainViewModel.ErrorType.SignatureUnavailableThis -> "${stringResource(R.string.error_none_this_signature)}\n$errorTextBody"
 
-                    is MainViewModel.ErrorType.SignatureUnavailableApk -> "stringResource(R.string.error_none_apk_signature)}\n$errorTextBody"
+                    is MainViewModel.ErrorType.SignatureUnavailableApk -> "${stringResource(R.string.error_none_apk_signature)}\n$errorTextBody"
                 }
 
                 else -> stringResource(R.string.loading)
