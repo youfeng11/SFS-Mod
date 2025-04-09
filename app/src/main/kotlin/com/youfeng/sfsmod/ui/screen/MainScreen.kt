@@ -3,11 +3,6 @@ package com.youfeng.sfsmod.ui.screen
 import android.os.Build
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -196,22 +191,19 @@ private fun VersionInfo() {
 @Composable
 private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        // 状态图标动画（淡入淡出300ms）
         AnimatedContent(
-            targetState = uiState,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
-            }
-        ) { state -> LoadingIcon(state) }
+            targetState = uiState
+        ) { LoadingIcon(it) }
 
         val errorTextBody = stringResource(
             R.string.error_none_body,
             "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
         )
-        // 动态文本（自动调整布局大小）
+
+        AnimatedContent(
+            targetState = uiState
+        ) { uiState ->
         Text(
-            modifier = Modifier.animateContentSize(),
-            textAlign = TextAlign.Center,
             text = when (uiState) {
                 is MainViewModel.ScreenState.Stopped -> stringResource(R.string.stopped)
                 is MainViewModel.ScreenState.Done -> stringResource(
@@ -231,6 +223,7 @@ private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
 
                 else -> stringResource(R.string.loading)
             },
+            textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge,
             color = when (uiState) {
                 is MainViewModel.ScreenState.Loading -> Color.Unspecified
@@ -238,6 +231,7 @@ private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
                 else -> MaterialTheme.colorScheme.primary // 其他状态显示主题色
             }
         )
+        }
     }
 }
 

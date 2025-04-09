@@ -1,4 +1,4 @@
-package com.youfeng.sfsmod
+package com.youfeng.sfsmod.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

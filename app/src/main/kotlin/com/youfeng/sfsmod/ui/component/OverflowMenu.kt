@@ -1,10 +1,6 @@
 package com.youfeng.sfsmod.ui.component
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
@@ -59,18 +55,15 @@ fun OverflowMenu(viewModel: MainViewModel, uiState: MainViewModel.ScreenState) {
         AnimatedContent(
             targetState = uiState is MainViewModel.ScreenState.Loading
                     || uiState is MainViewModel.ScreenState.Done,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
-            }
-        ) { isRunning ->
+        ) {
             MenuItem(
-                text = stringResource(if (isRunning) R.string.menu_stop else R.string.menu_refresh),
-                icon = if (isRunning) Icons.Filled.Close else Icons.Filled.Refresh
+                text = stringResource(if (it) R.string.menu_stop else R.string.menu_refresh),
+                icon = if (it) Icons.Filled.Close else Icons.Filled.Refresh
             ) {
                 menuExpanded = false
                 viewModel.apply {
                     stopCoroutine()
-                    if (isRunning) setStoppedState() else startCoroutine()
+                    if (it) setStoppedState() else startCoroutine()
                 }
             }
         }
