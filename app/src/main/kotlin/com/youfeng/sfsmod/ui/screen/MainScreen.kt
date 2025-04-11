@@ -203,34 +203,34 @@ private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
         AnimatedContent(
             targetState = uiState
         ) { uiState ->
-        Text(
-            text = when (uiState) {
-                is MainViewModel.ScreenState.Stopped -> stringResource(R.string.stopped)
-                is MainViewModel.ScreenState.Done -> stringResource(
-                    R.string.done,
-                    timer
-                )
+            Text(
+                text = when (uiState) {
+                    is MainViewModel.ScreenState.Stopped -> stringResource(R.string.stopped)
+                    is MainViewModel.ScreenState.Done -> stringResource(
+                        R.string.done,
+                        timer
+                    )
 
-                is MainViewModel.ScreenState.Error -> when (uiState.errorType) {
-                    is MainViewModel.ErrorType.SignatureMismatch -> stringResource(R.string.error_sign)
+                    is MainViewModel.ScreenState.Error -> when (uiState.errorType) {
+                        is MainViewModel.ErrorType.SignatureMismatch -> stringResource(R.string.error_sign)
 
-                    is MainViewModel.ErrorType.SignatureUnavailablePath -> "${stringResource(R.string.error_none_path)}\n$errorTextBody"
+                        is MainViewModel.ErrorType.SignatureUnavailablePath -> "${stringResource(R.string.error_none_path)}\n$errorTextBody"
 
-                    is MainViewModel.ErrorType.SignatureUnavailableThis -> "${stringResource(R.string.error_none_this_signature)}\n$errorTextBody"
+                        is MainViewModel.ErrorType.SignatureUnavailableThis -> "${stringResource(R.string.error_none_this_signature)}\n$errorTextBody"
 
-                    is MainViewModel.ErrorType.SignatureUnavailableApk -> "${stringResource(R.string.error_none_apk_signature)}\n$errorTextBody"
+                        is MainViewModel.ErrorType.SignatureUnavailableApk -> "${stringResource(R.string.error_none_apk_signature)}\n$errorTextBody"
+                    }
+
+                    else -> stringResource(R.string.loading)
+                },
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge,
+                color = when (uiState) {
+                    is MainViewModel.ScreenState.Loading -> Color.Unspecified
+                    is MainViewModel.ScreenState.Error -> MaterialTheme.colorScheme.error // 错误状态显示红色
+                    else -> MaterialTheme.colorScheme.primary // 其他状态显示主题色
                 }
-
-                else -> stringResource(R.string.loading)
-            },
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyLarge,
-            color = when (uiState) {
-                is MainViewModel.ScreenState.Loading -> Color.Unspecified
-                is MainViewModel.ScreenState.Error -> MaterialTheme.colorScheme.error // 错误状态显示红色
-                else -> MaterialTheme.colorScheme.primary // 其他状态显示主题色
-            }
-        )
+            )
         }
     }
 }
