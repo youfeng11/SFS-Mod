@@ -3,6 +3,7 @@ package com.youfeng.sfsmod.ui.screen
 import android.os.Build
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -223,6 +224,7 @@ private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
 
                     else -> stringResource(R.string.loading)
                 },
+                modifier = Modifier.animateContentSize(),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge,
                 color = when (uiState) {

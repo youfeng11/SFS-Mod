@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.MainActivity"
-            android:configChanges="navigation|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize|navigation|uiMode|layoutDirection"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
