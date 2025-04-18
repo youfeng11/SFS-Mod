@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -89,7 +90,13 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 
     // 基础布局容器
     Surface(modifier = Modifier.fillMaxSize()) {
-        MainLayout(viewModel, uiState, timer)
+        MainLayout(
+            viewModel::startCoroutine,
+            viewModel::stopCoroutine,
+            viewModel::setStoppedState,
+            uiState,
+            timer
+        )
     }
 }
 
@@ -121,7 +128,13 @@ fun LifecycleAwareHandler(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MainLayout(viewModel: MainViewModel, uiState: MainViewModel.ScreenState, timer: Int) {
+private fun MainLayout(
+    startCoroutine: () -> Unit,
+    stopCoroutine: () -> Unit,
+    setStoppedState: () -> Unit,
+    uiState: MainViewModel.ScreenState,
+    timer: Int
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -129,7 +142,12 @@ private fun MainLayout(viewModel: MainViewModel, uiState: MainViewModel.ScreenSt
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.topbar_title)) },
-                actions = { OverflowMenu(viewModel, uiState) }, // 右上角菜单按钮
+                actions = { OverflowMenu(
+                    startCoroutine,
+                    stopCoroutine,
+                    setStoppedState,
+                    uiState
+                ) }, // 右上角菜单按钮
                 scrollBehavior = scrollBehavior
             )
         },
@@ -207,6 +225,7 @@ private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
             Text(
                 text = when (uiState) {
                     is MainViewModel.ScreenState.Stopped -> stringResource(R.string.stopped)
+
                     is MainViewModel.ScreenState.Done -> stringResource(
                         R.string.done,
                         timer
@@ -266,3 +285,10 @@ private fun LoadingIcon(state: MainViewModel.ScreenState) {
             .padding(horizontal = 16.dp)
     )
 }
+
+@Preview
+@Composable
+fun MainLayoutPreview() {
+    MainLayout( {}, {}, {}, MainViewModel.ScreenState.Loading, 0 )
+}
+

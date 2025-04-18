@@ -21,18 +21,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.youfeng.sfsmod.R
-import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 
 /**
  * 右上角溢出菜单组件
- * @param viewModel 用于控制业务流程状态
  * 功能特性：
  * - 动态切换"停止/刷新"按钮状态
  * - 显示关于和开源许可对话框
  * - 300ms淡入淡出动效
  */
 @Composable
-fun OverflowMenu(viewModel: MainViewModel, uiState: MainViewModel.ScreenState) {
+fun OverflowMenu(
+    startCoroutine: () -> Unit,
+    stopCoroutine: () -> Unit,
+    setStoppedState: () -> Unit,
+    uiState: MainViewModel.ScreenState
+) {
     // region 状态管理
     var menuExpanded by remember { mutableStateOf(false) }
     var openAboutDialog by remember { mutableStateOf(false) }
@@ -55,16 +58,14 @@ fun OverflowMenu(viewModel: MainViewModel, uiState: MainViewModel.ScreenState) {
         AnimatedContent(
             targetState = uiState is MainViewModel.ScreenState.Loading
                     || uiState is MainViewModel.ScreenState.Done,
-        ) {
+        ) { isRunning ->
             MenuItem(
-                text = stringResource(if (it) R.string.menu_stop else R.string.menu_refresh),
-                icon = if (it) Icons.Filled.Close else Icons.Filled.Refresh
+                text = stringResource(if (isRunning) R.string.menu_stop else R.string.menu_refresh),
+                icon = if (isRunning) Icons.Filled.Close else Icons.Filled.Refresh
             ) {
                 menuExpanded = false
-                viewModel.apply {
-                    stopCoroutine()
-                    if (it) setStoppedState() else startCoroutine()
-                }
+                stopCoroutine()
+                if (isRunning) setStoppedState() else startCoroutine()
             }
         }
 
