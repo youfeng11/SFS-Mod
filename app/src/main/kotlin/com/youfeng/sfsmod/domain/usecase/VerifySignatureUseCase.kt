@@ -1,6 +1,6 @@
 package com.youfeng.sfsmod.domain.usecase
 
-import com.youfeng.sfsmod.data.VerifySignatureStates
+import com.youfeng.sfsmod.data.model.VerifySignatureStates
 import com.youfeng.sfsmod.utils.SignatureUtil
 import com.youfeng.sfsmod.utils.sha256
 import okio.Path
@@ -26,7 +26,7 @@ class VerifySignatureUseCase @Inject constructor(
     operator fun invoke(externalCachePath: Path?): VerifySignatureStates {
         // 参数有效性检查
         externalCachePath
-            ?: return VerifySignatureStates.SignatureUnavailablePathIsNull
+            ?: return VerifySignatureStates.SignatureUnavailablePath
 
         // 获取当前应用签名
         val currentSignature = signatureUtil.getCurrentAppSignature()
@@ -36,12 +36,12 @@ class VerifySignatureUseCase @Inject constructor(
         val targetSignature = signatureUtil.getApkSignature(externalCachePath)
             ?: return VerifySignatureStates.SignatureUnavailableApk
 
-        // 计算签名哈希值
-        val currentHash = currentSignature.toByteArray().sha256()
-        val targetHash = targetSignature.toByteArray().sha256()
+        // 计算签名SHA-256值
+        val currentSha256 = currentSignature.toByteArray().sha256()
+        val targetSha256 = targetSignature.toByteArray().sha256()
 
         return when {
-            currentHash.contentEquals(targetHash) -> VerifySignatureStates.SignatureValid
+            currentSha256.contentEquals(targetSha256) -> VerifySignatureStates.SignatureValid
             else -> VerifySignatureStates.SignatureMismatch
         }
     }

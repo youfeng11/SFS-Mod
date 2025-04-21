@@ -1,9 +1,9 @@
 package com.youfeng.sfsmod.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.youfeng.sfsmod.data.MainRepository
-import com.youfeng.sfsmod.data.VerifySignatureStates
-import com.youfeng.sfsmod.domain.usecase.CopyResourcesUseCase
+import com.youfeng.sfsmod.data.model.VerifySignatureStates
+import com.youfeng.sfsmod.data.repository.MainRepository
+import com.youfeng.sfsmod.domain.usecase.VerifySignatureUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okio.Path
 import javax.inject.Inject
 
 /**
@@ -31,13 +32,12 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: MainRepository,
-    private val copyResourcesUseCase: CopyResourcesUseCase
+    private val verifySignatureUseCase: VerifySignatureUseCase
 ) : ViewModel() {
 
     // region 事件流配置
     /**
      * 一次性UI事件流（如导航、振动）
-     * 使用SharedFlow避免重复消费问题
      */
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -65,17 +65,18 @@ class MainViewModel @Inject constructor(
     /**
      * 倒计时状态流（单位：秒）
      * 从3开始倒计时到0后触发导航
-     */
+     *//*
     private val _timer = MutableStateFlow(3)
     val timer: StateFlow<Int> = _timer
-    // endregion
+    // endregion*/
 
     // region 公共方法
     /**
      * 强制更新状态为已停止
      * 用于用户主动取消操作
      */
-    fun setStoppedState() {
+    fun menuStopOnClick() {
+        stopCoroutine()
         _state.update { ScreenState.Stopped }
     }
 
@@ -83,7 +84,7 @@ class MainViewModel @Inject constructor(
      * 安全启动协程的入口方法
      * 仅在Loading或Done状态允许重新启动
      */
-    fun startCoroutineOnStart() {
+    fun activityOnStart() {
         if (state.value is ScreenState.Loading || state.value is ScreenState.Done) {
             startCoroutine()
         }
@@ -101,9 +102,10 @@ class MainViewModel @Inject constructor(
 
         _state.update { ScreenState.Loading }
         coroutineScope.launch {
-            val result = copyResourcesUseCase()
+            val externalCachePath: Path? = repository.copyResources()
+            val result = verifySignatureUseCase(externalCachePath)
             _uiEvent.send(UiEvent.Vibrate) // 操作完成触发振动反馈
-            handleCopyResult(result)
+            handleCopyResult(result, externalCachePath)
         }
     }
 
@@ -122,45 +124,25 @@ class MainViewModel @Inject constructor(
      * @param result 来自Repository的验证结果
      *
      * 逻辑分支：
-     * - 签名有效：启动倒计时并导航
+     * - 签名一致：启动倒计时并安装
      * - 签名不匹配：显示对应错误
-     * - 签名不可用：显示系统级错误
+     * - 签名获取失败：显示错误详细
      */
-    private suspend fun handleCopyResult(result: VerifySignatureStates) {
-        when (result) {
-            is VerifySignatureStates.SignatureValid -> {
-                _state.update { ScreenState.Done }
-                // 3秒倒计时逻辑
-                for (i in 3 downTo 0) {
-                    _timer.update { i }
-                    delay(1000)
-                }
-                repository.installApk()
-                _uiEvent.send(UiEvent.Finish)
+    private suspend fun handleCopyResult(result: VerifySignatureStates, apkPath: Path?) {
+        if (result is VerifySignatureStates.SignatureValid) {
+            
+            // 3秒倒计时逻辑
+            for (i in 3 downTo 0) {
+                //_timer.update { i }
+                _state.update { ScreenState.Done(i) }
+                delay(1000)
             }
-
-            is VerifySignatureStates.SignatureMismatch -> _state.update {
-                ScreenState.Error(
-                    ErrorType.SignatureMismatch
-                )
+            if (apkPath != null) {
+                _uiEvent.send(UiEvent.Done(apkPath))
             }
-
-            is VerifySignatureStates.SignatureUnavailablePathIsNull -> _state.update {
-                ScreenState.Error(
-                    ErrorType.SignatureUnavailablePath
-                )
-            }
-
-            is VerifySignatureStates.SignatureUnavailableThis -> _state.update {
-                ScreenState.Error(
-                    ErrorType.SignatureUnavailableThis
-                )
-            }
-
-            is VerifySignatureStates.SignatureUnavailableApk -> _state.update {
-                ScreenState.Error(
-                    ErrorType.SignatureUnavailableApk
-                )
+        } else {
+            _state.update {
+                ScreenState.Error(result)
             }
         }
     }
@@ -171,48 +153,32 @@ class MainViewModel @Inject constructor(
         coroutineScope.cancel()
     }
 
-    // region 状态定义
-    /**
-     * 界面状态密封类
-     */
-    sealed class ScreenState {
-        /** 资源复制中状态 */
-        data object Loading : ScreenState()
+}
 
-        /** 用户主动停止状态 */
-        data object Stopped : ScreenState()
+/**
+ * 界面状态密封类
+ */
+sealed class ScreenState {
+    /** 资源复制中状态 */
+    object Loading : ScreenState()
 
-        /** 操作成功完成状态 */
-        data object Done : ScreenState()
+    /** 用户主动停止状态 */
+    object Stopped : ScreenState()
 
-        /** 错误状态（携带具体错误类型） */
-        data class Error(val errorType: ErrorType) : ScreenState()
-    }
+    /** 操作成功完成状态 */
+    data class Done(val timer: Int) : ScreenState()
 
-    /**
-     * 错误类型枚举
-     */
-    sealed class ErrorType {
-        /** 签名不匹配（APK被篡改） */
-        data object SignatureMismatch : ErrorType()
+    /** 错误状态（携带具体错误类型） */
+    data class Error(val errorType: VerifySignatureStates) : ScreenState()
+}
 
-        /** 无法获取签名（系统限制） */
-        data object SignatureUnavailablePath : ErrorType()
+/**
+ * UI事件类型定义
+ */
+sealed class UiEvent {
+    /** 跳转至APK安装界面 */
+    data class Done(val apkPath: Path) : UiEvent()
 
-        data object SignatureUnavailableThis : ErrorType()
-
-        data object SignatureUnavailableApk : ErrorType()
-    }
-
-    /**
-     * UI事件类型定义
-     */
-    sealed class UiEvent {
-        /** 跳转至APK安装界面 */
-        data object Finish : UiEvent()
-
-        /** 触发设备振动反馈 */
-        data object Vibrate : UiEvent()
-    }
-    // endregion
+    /** 触发设备振动反馈 */
+    object Vibrate : UiEvent()
 }

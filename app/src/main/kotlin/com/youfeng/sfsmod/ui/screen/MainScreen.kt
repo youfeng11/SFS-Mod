@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -45,9 +46,13 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.R
+import com.youfeng.sfsmod.data.model.VerifySignatureStates
 import com.youfeng.sfsmod.ui.component.OverflowMenu
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
+import com.youfeng.sfsmod.ui.viewmodel.UiEvent
+import com.youfeng.sfsmod.ui.viewmodel.ScreenState
 import com.youfeng.sfsmod.utils.vibrate
+import com.youfeng.sfsmod.utils.installApk
 
 /**
  * 主界面入口，实现：
@@ -60,13 +65,13 @@ import com.youfeng.sfsmod.utils.vibrate
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val uiState by viewModel.state.collectAsState()
-    val timer by viewModel.timer.collectAsState()
+    //val timer by viewModel.timer.collectAsState()
 
 
     // region 生命周期管理
     // 在 MainScreen 中使用
     LifecycleAwareHandler(
-        onStart = viewModel::startCoroutineOnStart,
+        onStart = viewModel::activityOnStart,
         onStop = viewModel::stopCoroutine
     )
     // endregion
@@ -76,11 +81,12 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     LaunchedEffect(viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is MainViewModel.UiEvent.Finish -> {
+                is UiEvent.Done -> {
+                    context?.installApk(event.apkPath)
                     context?.finish() // 关闭当前Activity
                 }
 
-                is MainViewModel.UiEvent.Vibrate -> {
+                is UiEvent.Vibrate -> {
                     context?.vibrate() // 短振动反馈
                 }
             }
@@ -91,11 +97,10 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     // 基础布局容器
     Surface(modifier = Modifier.fillMaxSize()) {
         MainLayout(
-            viewModel::startCoroutine,
-            viewModel::stopCoroutine,
-            viewModel::setStoppedState,
-            uiState,
-            timer
+            menuRestartOnClick = viewModel::startCoroutine,
+            menuStopOnClick = viewModel::menuStopOnClick,
+            uiState/*,
+            timer*/
         )
     }
 }
@@ -129,11 +134,10 @@ fun LifecycleAwareHandler(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainLayout(
-    startCoroutine: () -> Unit,
-    stopCoroutine: () -> Unit,
-    setStoppedState: () -> Unit,
-    uiState: MainViewModel.ScreenState,
-    timer: Int
+    menuRestartOnClick: () -> Unit,
+    menuStopOnClick: () -> Unit,
+    uiState: ScreenState/*,
+    timer: Int*/
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -143,9 +147,8 @@ private fun MainLayout(
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.topbar_title)) },
                 actions = { OverflowMenu(
-                    startCoroutine,
-                    stopCoroutine,
-                    setStoppedState,
+                    menuRestartOnClick = menuRestartOnClick,
+                    menuStopOnClick = menuStopOnClick,
                     uiState
                 ) }, // 右上角菜单按钮
                 scrollBehavior = scrollBehavior
@@ -155,8 +158,8 @@ private fun MainLayout(
     ) { innerPadding ->
         ContentArea(
             modifier = Modifier.padding(innerPadding),
-            uiState = uiState,
-            timer = timer
+            uiState = uiState/*,
+            timer = timer*/
         )
     }
 }
@@ -171,8 +174,8 @@ private fun MainLayout(
 @Composable
 private fun ContentArea(
     modifier: Modifier = Modifier,
-    uiState: MainViewModel.ScreenState,
-    timer: Int
+    uiState: ScreenState/*,
+    timer: Int*/
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -180,7 +183,7 @@ private fun ContentArea(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         VersionInfo()
-        LoadingSection(uiState, timer)
+        LoadingSection(uiState)//, timer)
         Text(
             text = stringResource(R.string.warning),
             style = MaterialTheme.typography.bodyMedium,
@@ -208,10 +211,16 @@ private fun VersionInfo() {
  * - 状态文本描述
  */
 @Composable
-private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
+private fun LoadingSection(uiState: ScreenState/*, timer: Int*/) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val iconData: Pair<ImageVector, Color>? = when (uiState) {
+        is ScreenState.Stopped -> Icons.Filled.Close to MaterialTheme.colorScheme.primary
+        is ScreenState.Done -> Icons.Filled.Done to MaterialTheme.colorScheme.primary
+        is ScreenState.Error -> Icons.Filled.Warning to MaterialTheme.colorScheme.error
+        else -> null
+        }
         AnimatedContent(
-            targetState = uiState
+            targetState = iconData
         ) { LoadingIcon(it) }
 
         val errorTextBody = stringResource(
@@ -224,31 +233,33 @@ private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
         ) { uiState ->
             Text(
                 text = when (uiState) {
-                    is MainViewModel.ScreenState.Stopped -> stringResource(R.string.stopped)
+                    is ScreenState.Stopped -> stringResource(R.string.stopped)
 
-                    is MainViewModel.ScreenState.Done -> stringResource(
+                    is ScreenState.Done -> stringResource(
                         R.string.done,
-                        timer
+                        uiState.timer
                     )
 
-                    is MainViewModel.ScreenState.Error -> when (uiState.errorType) {
-                        is MainViewModel.ErrorType.SignatureMismatch -> stringResource(R.string.error_sign)
+                    is ScreenState.Error -> when (uiState.errorType) {
+                        is VerifySignatureStates.SignatureMismatch -> stringResource(R.string.error_sign)
 
-                        is MainViewModel.ErrorType.SignatureUnavailablePath -> "${stringResource(R.string.error_none_path)}\n$errorTextBody"
+                        is VerifySignatureStates.SignatureUnavailablePath -> "${stringResource(R.string.error_none_other)}\n$errorTextBody"
 
-                        is MainViewModel.ErrorType.SignatureUnavailableThis -> "${stringResource(R.string.error_none_this_signature)}\n$errorTextBody"
+                        is VerifySignatureStates.SignatureUnavailableThis -> "${stringResource(R.string.error_none_this_signature)}\n$errorTextBody"
 
-                        is MainViewModel.ErrorType.SignatureUnavailableApk -> "${stringResource(R.string.error_none_apk_signature)}\n$errorTextBody"
+                        is VerifySignatureStates.SignatureUnavailableApk -> "${stringResource(R.string.error_none_apk_signature)}\n$errorTextBody"
+                        
+                        else -> stringResource(R.string.error_none_other)
                     }
 
-                    else -> stringResource(R.string.loading)
+                    is ScreenState.Loading -> stringResource(R.string.loading)
                 },
                 modifier = Modifier.animateContentSize(),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge,
                 color = when (uiState) {
-                    is MainViewModel.ScreenState.Loading -> Color.Unspecified
-                    is MainViewModel.ScreenState.Error -> MaterialTheme.colorScheme.error // 错误状态显示红色
+                    is ScreenState.Loading -> Color.Unspecified
+                    is ScreenState.Error -> MaterialTheme.colorScheme.error // 错误状态显示红色
                     else -> MaterialTheme.colorScheme.primary // 其他状态显示主题色
                 }
             )
@@ -264,13 +275,7 @@ private fun LoadingSection(uiState: MainViewModel.ScreenState, timer: Int) {
  * - 加载中：显示进度条
  */
 @Composable
-private fun LoadingIcon(state: MainViewModel.ScreenState) {
-    val iconData = when (state) {
-        is MainViewModel.ScreenState.Stopped -> Icons.Filled.Close to MaterialTheme.colorScheme.primary
-        is MainViewModel.ScreenState.Done -> Icons.Filled.Done to MaterialTheme.colorScheme.primary
-        is MainViewModel.ScreenState.Error -> Icons.Filled.Warning to MaterialTheme.colorScheme.error
-        else -> null
-    }
+private fun LoadingIcon(iconData: Pair<ImageVector, Color>?) {
 
     iconData?.let { (icon, tint) ->
         Icon(
@@ -286,9 +291,48 @@ private fun LoadingIcon(state: MainViewModel.ScreenState) {
     )
 }
 
-@Preview
+
+
+// UI预览
+
+@Preview(showBackground = true)
 @Composable
-fun MainLayoutPreview() {
-    MainLayout( {}, {}, {}, MainViewModel.ScreenState.Loading, 0 )
+fun MainLayoutLoadingPreview() {
+    MainLayout( {}, {}, ScreenState.Loading )
 }
 
+@Preview(showBackground = true)
+@Composable
+fun MainLayoutStoppedPreview() {
+    MainLayout( {}, {}, ScreenState.Stopped )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainLayoutDonePreview() {
+    MainLayout( {}, {}, ScreenState.Done(1) )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainLayoutErrorSignatureMismatchPreview() {
+    MainLayout( {}, {}, ScreenState.Error(VerifySignatureStates.SignatureMismatch) )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainLayoutErrorSignatureUnavailablePathPreview() {
+    MainLayout( {}, {}, ScreenState.Error(VerifySignatureStates.SignatureUnavailablePath) )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainLayoutErrorSignatureUnavailableThisPreview() {
+    MainLayout( {}, {}, ScreenState.Error(VerifySignatureStates.SignatureUnavailableThis) )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainLayoutErrorSignatureUnavailableApkPreview() {
+    MainLayout( {}, {}, ScreenState.Error(VerifySignatureStates.SignatureUnavailableApk) )
+}

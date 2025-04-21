@@ -21,7 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.youfeng.sfsmod.R
-import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
+import com.youfeng.sfsmod.ui.viewmodel.ScreenState
 
 /**
  * 右上角溢出菜单组件
@@ -32,10 +32,9 @@ import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
  */
 @Composable
 fun OverflowMenu(
-    startCoroutine: () -> Unit,
-    stopCoroutine: () -> Unit,
-    setStoppedState: () -> Unit,
-    uiState: MainViewModel.ScreenState
+    menuRestartOnClick: () -> Unit,
+    menuStopOnClick: () -> Unit,
+    uiState: ScreenState
 ) {
     // region 状态管理
     var menuExpanded by remember { mutableStateOf(false) }
@@ -57,16 +56,15 @@ fun OverflowMenu(
     ) {
         // 动态切换的操作项
         AnimatedContent(
-            targetState = uiState is MainViewModel.ScreenState.Loading
-                    || uiState is MainViewModel.ScreenState.Done,
+            targetState = uiState is ScreenState.Loading
+                    || uiState is ScreenState.Done,
         ) { isRunning ->
             MenuItem(
-                text = stringResource(if (isRunning) R.string.menu_stop else R.string.menu_refresh),
+                text = stringResource(if (isRunning) R.string.menu_stop else R.string.menu_restart),
                 icon = if (isRunning) Icons.Filled.Close else Icons.Filled.Refresh
             ) {
                 menuExpanded = false
-                stopCoroutine()
-                if (isRunning) setStoppedState() else startCoroutine()
+                if (isRunning) menuStopOnClick() else menuRestartOnClick()
             }
         }
 
