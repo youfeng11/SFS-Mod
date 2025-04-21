@@ -3,6 +3,7 @@ package com.youfeng.sfsmod.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import com.youfeng.sfsmod.data.model.VerifySignatureStates
 import com.youfeng.sfsmod.data.repository.MainRepository
+import com.youfeng.sfsmod.domain.usecase.CountdownUseCase
 import com.youfeng.sfsmod.domain.usecase.VerifySignatureUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -11,7 +12,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -26,13 +26,12 @@ import javax.inject.Inject
  * 2. 签名验证状态管理
  * 3. 倒计时逻辑
  * 4. 系统事件触发（振动、导航等）
- *
- * @constructor 通过Hilt注入依赖
  */
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: MainRepository,
-    private val verifySignatureUseCase: VerifySignatureUseCase
+    private val verifySignatureUseCase: VerifySignatureUseCase,
+    private val countdownUseCase: CountdownUseCase
 ) : ViewModel() {
 
     // region 事件流配置
@@ -62,14 +61,6 @@ class MainViewModel @Inject constructor(
     private val _state = MutableStateFlow<ScreenState>(ScreenState.Loading)
     val state: StateFlow<ScreenState> = _state
 
-    /**
-     * 倒计时状态流（单位：秒）
-     * 从3开始倒计时到0后触发导航
-     *//*
-    private val _timer = MutableStateFlow(3)
-    val timer: StateFlow<Int> = _timer
-    // endregion*/
-
     // region 公共方法
     /**
      * 强制更新状态为已停止
@@ -77,7 +68,7 @@ class MainViewModel @Inject constructor(
      */
     fun menuStopOnClick() {
         stopCoroutine()
-        _state.update { ScreenState.Stopped }
+        sendState(ScreenState.Stopped)
     }
 
     /**
@@ -100,11 +91,11 @@ class MainViewModel @Inject constructor(
     fun startCoroutine() {
         stopCoroutine()
 
-        _state.update { ScreenState.Loading }
+        sendState(ScreenState.Loading)
         coroutineScope.launch {
             val externalCachePath: Path? = repository.copyResources()
             val result = verifySignatureUseCase(externalCachePath)
-            _uiEvent.send(UiEvent.Vibrate) // 操作完成触发振动反馈
+            _uiEvent.trySend(UiEvent.Vibrate) // 操作完成触发振动反馈
             handleCopyResult(result, externalCachePath)
         }
     }
@@ -121,7 +112,6 @@ class MainViewModel @Inject constructor(
     // region 私有逻辑
     /**
      * 处理资源复制结果
-     * @param result 来自Repository的验证结果
      *
      * 逻辑分支：
      * - 签名一致：启动倒计时并安装
@@ -131,26 +121,30 @@ class MainViewModel @Inject constructor(
     private suspend fun handleCopyResult(result: VerifySignatureStates, apkPath: Path?) {
         if (result is VerifySignatureStates.SignatureValid) {
 
-            // 3秒倒计时逻辑
-            for (i in 3 downTo 0) {
-                //_timer.update { i }
-                _state.update { ScreenState.Done(i) }
-                delay(1000)
-            }
-            if (apkPath != null) {
-                _uiEvent.send(UiEvent.Done(apkPath))
-            }
+            countdownUseCase(
+                onTick = { timer ->
+                    sendState(ScreenState.Done(timer))
+                },
+                onFinish = {
+                    if (apkPath != null) {
+                        _uiEvent.trySend(UiEvent.NavigateToInstall(apkPath))
+                    }
+                }
+            )
         } else {
-            _state.update {
-                ScreenState.Error(result)
-            }
+            sendState(ScreenState.Error(result))
         }
     }
+
+    private fun sendState(newState: ScreenState) {
+        _state.update { newState }
+    }
+
     // endregion
 
     override fun onCleared() {
-        super.onCleared()
         coroutineScope.cancel()
+        super.onCleared()
     }
 
 }
@@ -160,10 +154,10 @@ class MainViewModel @Inject constructor(
  */
 sealed class ScreenState {
     /** 资源复制中状态 */
-    object Loading : ScreenState()
+    data object Loading : ScreenState()
 
     /** 用户主动停止状态 */
-    object Stopped : ScreenState()
+    data object Stopped : ScreenState()
 
     /** 操作成功完成状态 */
     data class Done(val timer: Int) : ScreenState()
@@ -176,9 +170,6 @@ sealed class ScreenState {
  * UI事件类型定义
  */
 sealed class UiEvent {
-    /** 跳转至APK安装界面 */
-    data class Done(val apkPath: Path) : UiEvent()
-
-    /** 触发设备振动反馈 */
-    object Vibrate : UiEvent()
+    data class NavigateToInstall(val apkPath: Path) : UiEvent()
+    data object Vibrate : UiEvent()
 }

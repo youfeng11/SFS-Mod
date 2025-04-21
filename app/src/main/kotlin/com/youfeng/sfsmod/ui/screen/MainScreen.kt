@@ -1,6 +1,5 @@
 package com.youfeng.sfsmod.ui.screen
 
-import android.os.Build
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
@@ -51,6 +50,7 @@ import com.youfeng.sfsmod.ui.component.OverflowMenu
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 import com.youfeng.sfsmod.ui.viewmodel.ScreenState
 import com.youfeng.sfsmod.ui.viewmodel.UiEvent
+import com.youfeng.sfsmod.utils.DeviceInfo
 import com.youfeng.sfsmod.utils.installApk
 import com.youfeng.sfsmod.utils.vibrate
 
@@ -65,7 +65,6 @@ import com.youfeng.sfsmod.utils.vibrate
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val uiState by viewModel.state.collectAsState()
-    //val timer by viewModel.timer.collectAsState()
 
 
     // region 生命周期管理
@@ -81,14 +80,12 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     LaunchedEffect(viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is UiEvent.Done -> {
+                is UiEvent.NavigateToInstall -> {
                     context?.installApk(event.apkPath)
-                    context?.finish() // 关闭当前Activity
+                    context?.finish()
                 }
 
-                is UiEvent.Vibrate -> {
-                    context?.vibrate() // 短振动反馈
-                }
+                is UiEvent.Vibrate -> context?.vibrate()
             }
         }
     }
@@ -99,8 +96,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
         MainLayout(
             menuRestartOnClick = viewModel::startCoroutine,
             menuStopOnClick = viewModel::menuStopOnClick,
-            uiState/*,
-            timer*/
+            uiState
         )
     }
 }
@@ -136,8 +132,7 @@ fun LifecycleAwareHandler(
 private fun MainLayout(
     menuRestartOnClick: () -> Unit,
     menuStopOnClick: () -> Unit,
-    uiState: ScreenState/*,
-    timer: Int*/
+    uiState: ScreenState
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -160,8 +155,7 @@ private fun MainLayout(
     ) { innerPadding ->
         ContentArea(
             modifier = Modifier.padding(innerPadding),
-            uiState = uiState/*,
-            timer = timer*/
+            uiState = uiState
         )
     }
 }
@@ -176,8 +170,7 @@ private fun MainLayout(
 @Composable
 private fun ContentArea(
     modifier: Modifier = Modifier,
-    uiState: ScreenState/*,
-    timer: Int*/
+    uiState: ScreenState
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -185,7 +178,7 @@ private fun ContentArea(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         VersionInfo()
-        LoadingSection(uiState)//, timer)
+        LoadingSection(uiState)
         Text(
             text = stringResource(R.string.warning),
             style = MaterialTheme.typography.bodyMedium,
@@ -213,7 +206,7 @@ private fun VersionInfo() {
  * - 状态文本描述
  */
 @Composable
-private fun LoadingSection(uiState: ScreenState/*, timer: Int*/) {
+private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo.DeviceInfoString) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         val iconData: Pair<ImageVector, Color>? = when (uiState) {
             is ScreenState.Stopped -> Icons.Filled.Close to MaterialTheme.colorScheme.primary
@@ -227,7 +220,7 @@ private fun LoadingSection(uiState: ScreenState/*, timer: Int*/) {
 
         val errorTextBody = stringResource(
             R.string.error_none_body,
-            "${Build.BRAND}|${Build.MODEL}|${Build.DEVICE}|${Build.VERSION.SDK_INT}"
+            deviceInfo
         )
 
         AnimatedContent(
@@ -245,13 +238,13 @@ private fun LoadingSection(uiState: ScreenState/*, timer: Int*/) {
                     is ScreenState.Error -> when (uiState.errorType) {
                         is VerifySignatureStates.SignatureMismatch -> stringResource(R.string.error_sign)
 
-                        is VerifySignatureStates.SignatureUnavailablePath -> "${stringResource(R.string.error_none_other)}\n$errorTextBody"
+                        is VerifySignatureStates.SignatureUnavailablePath -> "${stringResource(R.string.error_other)}\n$errorTextBody"
 
                         is VerifySignatureStates.SignatureUnavailableThis -> "${stringResource(R.string.error_none_this_signature)}\n$errorTextBody"
 
                         is VerifySignatureStates.SignatureUnavailableApk -> "${stringResource(R.string.error_none_apk_signature)}\n$errorTextBody"
 
-                        else -> stringResource(R.string.error_none_other)
+                        is VerifySignatureStates.SignatureValid -> stringResource(R.string.error_other)
                     }
 
                     is ScreenState.Loading -> stringResource(R.string.loading)
@@ -295,44 +288,49 @@ private fun LoadingIcon(iconData: Pair<ImageVector, Color>?) {
 
 // UI预览
 
+@Composable
+private fun PreviewContainer(screenState: ScreenState) {
+    MainLayout({}, {}, screenState)
+}
+
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutLoadingPreview() {
-    MainLayout({}, {}, ScreenState.Loading)
+    PreviewContainer(ScreenState.Loading)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutStoppedPreview() {
-    MainLayout({}, {}, ScreenState.Stopped)
+    PreviewContainer(ScreenState.Stopped)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutDonePreview() {
-    MainLayout({}, {}, ScreenState.Done(1))
+    PreviewContainer(ScreenState.Done(3))
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutErrorSignatureMismatchPreview() {
-    MainLayout({}, {}, ScreenState.Error(VerifySignatureStates.SignatureMismatch))
+    PreviewContainer(ScreenState.Error(VerifySignatureStates.SignatureMismatch))
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutErrorSignatureUnavailablePathPreview() {
-    MainLayout({}, {}, ScreenState.Error(VerifySignatureStates.SignatureUnavailablePath))
+    PreviewContainer(ScreenState.Error(VerifySignatureStates.SignatureUnavailablePath))
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutErrorSignatureUnavailableThisPreview() {
-    MainLayout({}, {}, ScreenState.Error(VerifySignatureStates.SignatureUnavailableThis))
+    PreviewContainer(ScreenState.Error(VerifySignatureStates.SignatureUnavailableThis))
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutErrorSignatureUnavailableApkPreview() {
-    MainLayout({}, {}, ScreenState.Error(VerifySignatureStates.SignatureUnavailableApk))
+    PreviewContainer(ScreenState.Error(VerifySignatureStates.SignatureUnavailableApk))
 }

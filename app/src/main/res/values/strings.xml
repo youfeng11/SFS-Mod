@@ -12,7 +12,7 @@
     <string name="error_sign">签名不一致，安装无法进行！\n安装器可能被篡改，请从官方渠道（应用关于内的QQ群或123网盘）重新下载！</string>
     <string name="error_none_this_signature">无法获取当前应用签名信息</string>
     <string name="error_none_apk_signature">无法获取目标APK签名信息</string>
-    <string name="error_none_other">其他错误</string>
+    <string name="error_other">其他错误</string>
     <string name="error_none_body">出现了一些问题，或安装器被破坏，请尝试从官方渠道重新下载安装！\n若问题无法解决，请求助开发者！\n设备信息：%s</string>
     <string name="done">完成，%d 秒后开始安装</string>
 

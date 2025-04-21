@@ -9,20 +9,24 @@ import okio.Path.Companion.toPath
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface Repository {
+    suspend fun copyResources(): Path?
+}
+
 /**
  * 数据仓库，负责文件操作，不再包含业务逻辑
  */
 @Singleton
 class MainRepository @Inject constructor(
     @ApplicationContext private val context: Context
-) {
+) : Repository {
     private val fileSystem = FileSystem.SYSTEM
 
     /**
      * 复制资源文件
      * @return APK 临时文件路径
      */
-    suspend fun copyResources(): Path? {
+    override suspend fun copyResources(): Path? {
         val dataPath = "${context.filesDir.parent}/shared_prefs/".toPath()
         val languagePath =
             context.getExternalFilesDir("Custom Translations")?.absolutePath?.toPath()
