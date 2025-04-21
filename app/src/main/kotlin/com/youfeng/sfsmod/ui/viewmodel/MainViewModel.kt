@@ -130,7 +130,7 @@ class MainViewModel @Inject constructor(
      */
     private suspend fun handleCopyResult(result: VerifySignatureStates, apkPath: Path?) {
         if (result is VerifySignatureStates.SignatureValid) {
-            
+
             // 3秒倒计时逻辑
             for (i in 3 downTo 0) {
                 //_timer.update { i }

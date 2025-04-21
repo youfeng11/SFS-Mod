@@ -1,7 +1,6 @@
 package com.youfeng.sfsmod.data.repository
 
 import android.content.Context
-import com.youfeng.sfsmod.data.model.VerifySignatureStates
 import com.youfeng.sfsmod.utils.copyAssetFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okio.FileSystem
