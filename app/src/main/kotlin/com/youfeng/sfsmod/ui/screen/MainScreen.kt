@@ -5,11 +5,10 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -29,11 +28,12 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -137,7 +137,9 @@ private fun MainLayout(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .safeDrawingPadding(),
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.topbar_title)) },
@@ -150,8 +152,7 @@ private fun MainLayout(
                 }, // 右上角菜单按钮
                 scrollBehavior = scrollBehavior
             )
-        },
-        contentWindowInsets = WindowInsets.safeDrawing // 适配全面屏
+        }
     ) { innerPadding ->
         ContentArea(
             modifier = Modifier.padding(innerPadding),
@@ -208,14 +209,14 @@ private fun VersionInfo() {
 @Composable
 private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo.DeviceInfoString) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        val iconData: Pair<ImageVector, Color>? = when (uiState) {
-            is ScreenState.Stopped -> Icons.Filled.Close to MaterialTheme.colorScheme.primary
-            is ScreenState.Done -> Icons.Filled.Done to MaterialTheme.colorScheme.primary
-            is ScreenState.Error -> Icons.Filled.Warning to MaterialTheme.colorScheme.error
-            else -> null
-        }
+        var timer by remember { mutableIntStateOf(0) }
+        val state = if (uiState is ScreenState.Done) {
+            timer = uiState.timer
+            ScreenState.Done(0)
+        } else uiState
+
         AnimatedContent(
-            targetState = iconData
+            targetState = state
         ) { LoadingIcon(it) }
 
         val errorTextBody = stringResource(
@@ -224,7 +225,7 @@ private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo
         )
 
         AnimatedContent(
-            targetState = uiState
+            targetState = state
         ) { uiState ->
             Text(
                 text = when (uiState) {
@@ -232,7 +233,7 @@ private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo
 
                     is ScreenState.Done -> stringResource(
                         R.string.done,
-                        uiState.timer
+                        timer
                     )
 
                     is ScreenState.Error -> when (uiState.errorType) {
@@ -269,7 +270,13 @@ private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo
  * - 加载中：显示进度条
  */
 @Composable
-private fun LoadingIcon(iconData: Pair<ImageVector, Color>?) {
+private fun LoadingIcon(uiState: ScreenState) {
+    val iconData = when (uiState) {
+        is ScreenState.Stopped -> Icons.Filled.Close to MaterialTheme.colorScheme.primary
+        is ScreenState.Done -> Icons.Filled.Done to MaterialTheme.colorScheme.primary
+        is ScreenState.Error -> Icons.Filled.Warning to MaterialTheme.colorScheme.error
+        else -> null
+    }
 
     iconData?.let { (icon, tint) ->
         Icon(
