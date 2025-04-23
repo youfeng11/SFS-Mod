@@ -1,0 +1,13 @@
+{
+    "uniqueId": "com.youfeng.sfscn",
+    "developers": [
+        {
+            "name": "由风"
+        }
+    ],
+    "name": "SFS简体中文语言包",
+    "website": "https://gitee.com/YouFeng11/SFS-zh-CN-Translation",
+    "licenses": [
+        "MIT-sfscn"
+    ]
+}

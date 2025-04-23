@@ -106,7 +106,12 @@ android {
     }
 
     aboutLibraries {
-        registerAndroidTasks = false
+        android {
+            registerAndroidTasks = true
+        }
+        collect {
+            configPath = file("aboutlibs_config")
+        }
     }
 }
 

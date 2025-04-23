@@ -39,7 +39,7 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.r
 
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
 
-about-libraries-core = { group = "com.mikepenz", name = "aboutlibraries-core", version.ref = "about-libraries" }
+about-libraries-core = { group = "com.mikepenz", name = "aboutlibraries-compose-core", version.ref = "about-libraries" }
 about-libraries-ui = { group = "com.mikepenz", name = "aboutlibraries-compose-m3", version.ref = "about-libraries" }
 
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
