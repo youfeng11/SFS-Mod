@@ -1,14 +1,21 @@
 package com.youfeng.sfsmod.ui.component
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
+import com.mikepenz.aboutlibraries.ui.compose.m3.libraryColors
 import com.youfeng.sfsmod.R
 
 /**
@@ -25,7 +32,17 @@ fun CreditsDialog(onDismissRequest: () -> Unit) {
         title = { Text(stringResource(R.string.osl)) }, // R.string.osl对应"开源许可"
         text = {
             LibrariesContainer(
-                modifier = Modifier.fillMaxSize() // 全屏高度显示库列表
+                modifier = Modifier.fillMaxSize(), // 全屏高度显示库列表
+                colors = LibraryDefaults.libraryColors(backgroundColor = AlertDialogDefaults.containerColor),
+                divider = {
+                    HorizontalDivider(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 8.dp
+                            )
+                    )
+                }
             )
         },
         confirmButton = {
