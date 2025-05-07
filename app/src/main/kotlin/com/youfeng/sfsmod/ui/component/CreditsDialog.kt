@@ -34,7 +34,7 @@ fun CreditsDialog(onDismissRequest: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false),
-        modifier = Modifier.widthIn(max = configuration.screenWidthDp.dp - 80.dp),
+        modifier = Modifier.widthIn(max = configuration.screenWidthDp.dp - 60.dp),
         title = { Text(stringResource(R.string.osl)) }, // R.string.osl对应"开源许可"
         text = {
             LibrariesContainer(
