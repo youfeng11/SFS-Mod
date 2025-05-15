@@ -8,6 +8,8 @@ import okio.Path
 import okio.Path.Companion.toPath
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 interface Repository {
     suspend fun copyResources(): Path?
@@ -32,20 +34,22 @@ class MainRepository @Inject constructor(
             context.getExternalFilesDir("Custom Translations")?.absolutePath?.toPath()
         val externalCachePath = context.externalCacheDir?.absolutePath?.toPath()
 
-        // 创建目录
-        listOfNotNull(dataPath, languagePath, externalCachePath).forEach {
-            fileSystem.createDirectories(it)
+        return withContext(Dispatchers.IO) {
+            // 创建目录
+            listOfNotNull(dataPath, languagePath, externalCachePath).forEach {
+                fileSystem.createDirectories(it)
+            }
+
+            // 复制资源文件
+            context.copyAssetFile(
+                "mod.xml",
+                dataPath.resolve("com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml")
+            )
+            languagePath?.let { context.copyAssetFile("translation.txt", it.resolve("简体中文.txt")) }
+            externalCachePath?.let { context.copyAssetFile("base.apk.1", it.resolve("temp.apk")) }
+
+            externalCachePath?.resolve("temp.apk")
         }
-
-        // 复制资源文件
-        context.copyAssetFile(
-            "mod.xml",
-            dataPath.resolve("com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml")
-        )
-        languagePath?.let { context.copyAssetFile("translation.txt", it.resolve("简体中文.txt")) }
-        externalCachePath?.let { context.copyAssetFile("base.apk.1", it.resolve("temp.apk")) }
-
-        return externalCachePath?.resolve("temp.apk")
     }
 
 }
