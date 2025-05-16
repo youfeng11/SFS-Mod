@@ -112,6 +112,10 @@ android {
         collect {
             configPath = file("aboutlibs_config")
         }
+        library {
+            duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
+            duplicationRule = com.mikepenz.aboutlibraries.plugin.DuplicateRule.SIMPLE
+        }
     }
 }
 
