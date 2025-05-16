@@ -1,16 +1,13 @@
 package com.youfeng.sfsmod.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.youfeng.sfsmod.data.model.VerifySignatureStates
 import com.youfeng.sfsmod.data.repository.MainRepository
 import com.youfeng.sfsmod.domain.usecase.CountdownUseCase
 import com.youfeng.sfsmod.domain.usecase.VerifySignatureUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,10 +41,9 @@ class MainViewModel @Inject constructor(
 
     // region 协程作用域
     /**
-     * 主线程协程作用域，使用SupervisorJob实现子协程独立失败
-     * 注意：Dispatchers.Main.immediate在UI操作中更高效
+     * 主线程协程作用域
      */
-    private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var job: Job? = null
     // endregion
 
     // region 状态管理
@@ -92,7 +88,7 @@ class MainViewModel @Inject constructor(
         stopCoroutine()
 
         sendState(ScreenState.Loading)
-        coroutineScope.launch {
+        job = viewModelScope.launch {
             val externalCachePath: Path? = repository.copyResources()
             val result = verifySignatureUseCase(externalCachePath)
             _uiEvent.trySend(UiEvent.Vibrate) // 操作完成触发振动反馈
@@ -105,7 +101,7 @@ class MainViewModel @Inject constructor(
      * 用于取消进行中的操作
      */
     fun stopCoroutine() {
-        coroutineScope.coroutineContext.cancelChildren()
+        job?.cancel()
     }
     // endregion
 
@@ -143,7 +139,7 @@ class MainViewModel @Inject constructor(
     // endregion
 
     override fun onCleared() {
-        coroutineScope.cancel()
+        stopCoroutine()
         super.onCleared()
     }
 
