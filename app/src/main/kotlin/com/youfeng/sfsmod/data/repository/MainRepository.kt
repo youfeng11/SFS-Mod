@@ -3,13 +3,13 @@ package com.youfeng.sfsmod.data.repository
 import android.content.Context
 import com.youfeng.sfsmod.utils.copyAssetFile
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 interface Repository {
     suspend fun copyResources(): Path?
@@ -45,7 +45,12 @@ class MainRepository @Inject constructor(
                 "mod.xml",
                 dataPath.resolve("com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml")
             )
-            languagePath?.let { context.copyAssetFile("translation.txt", it.resolve("简体中文.txt")) }
+            languagePath?.let {
+                context.copyAssetFile(
+                    "translation.txt",
+                    it.resolve("简体中文.txt")
+                )
+            }
             externalCachePath?.let { context.copyAssetFile("base.apk.1", it.resolve("temp.apk")) }
 
             externalCachePath?.resolve("temp.apk")

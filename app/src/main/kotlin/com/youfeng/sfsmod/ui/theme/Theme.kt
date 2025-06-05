@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 // 通用的主题函数，应用全局主题
 @Composable
@@ -43,9 +44,10 @@ fun MainTheme(
     val view = LocalView.current
     SideEffect {
         val window = (view.context as Activity).window
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced =
-            false
+        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars =
+            !darkTheme
+        WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars =
+            !darkTheme
     }
 
     // 使用 MaterialTheme 包裹 UI 内容
