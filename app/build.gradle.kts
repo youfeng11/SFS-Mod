@@ -140,7 +140,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.compose.uiTooling)
 
-    implementation(libs.about.libraries.core)
     implementation(libs.about.libraries.ui)
 
     implementation(libs.okio)
