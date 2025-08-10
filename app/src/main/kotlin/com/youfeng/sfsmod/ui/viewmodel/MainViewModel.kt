@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.youfeng.sfsmod.data.model.VerifySignatureStates
 import com.youfeng.sfsmod.data.repository.MainRepository
+import com.youfeng.sfsmod.data.repository.InstallPermissionRepository
 import com.youfeng.sfsmod.domain.usecase.CountdownUseCase
 import com.youfeng.sfsmod.domain.usecase.VerifySignatureUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: MainRepository,
+    private val installPermissionRepository: InstallPermissionRepository,
     private val verifySignatureUseCase: VerifySignatureUseCase,
     private val countdownUseCase: CountdownUseCase
 ) : ViewModel() {
@@ -86,12 +88,17 @@ class MainViewModel @Inject constructor(
      */
     fun startCoroutine() {
         stopCoroutine()
+        // 检查权限
+        if (!installPermissionRepository.hasInstallPermission()) {
+            sendState(ScreenState.PermissionRequired)
+            return
+        }
 
         sendState(ScreenState.Loading)
         job = viewModelScope.launch {
             val externalCachePath: Path? = repository.copyResources()
             val result = verifySignatureUseCase(externalCachePath)
-            _uiEvent.trySend(UiEvent.Vibrate) // 操作完成触发振动反馈
+            _uiEvent.send(UiEvent.Vibrate) // 操作完成触发振动反馈
             handleCopyResult(result, externalCachePath)
         }
     }
@@ -102,6 +109,24 @@ class MainViewModel @Inject constructor(
      */
     fun stopCoroutine() {
         job?.cancel()
+    }
+
+    /**
+     * 当用户在对话框点击 "去授权" 时，由View层调用此方法
+     */
+    fun requestInstallPermission() {
+        _uiEvent.trySend(UiEvent.RequestInstallPermission)
+    }
+
+    /**
+     * 当用户从设置页返回时调用
+     */
+    fun onPermissionResult() {
+        // 再次检查权限
+        if (installPermissionRepository.hasInstallPermission()) {
+            startCoroutine()
+        } else {
+        }
     }
     // endregion
 
@@ -155,6 +180,9 @@ sealed class ScreenState {
     /** 用户主动停止状态 */
     data object Stopped : ScreenState()
 
+    /** 未授予“安装未知应用”权限的暂停状态 */
+    data object PermissionRequired : ScreenState()
+
     /** 操作成功完成状态 */
     data class Done(val timer: Int) : ScreenState()
 
@@ -168,4 +196,5 @@ sealed class ScreenState {
 sealed class UiEvent {
     data class NavigateToInstall(val apkPath: Path) : UiEvent()
     data object Vibrate : UiEvent()
+    data object RequestInstallPermission : UiEvent()
 }

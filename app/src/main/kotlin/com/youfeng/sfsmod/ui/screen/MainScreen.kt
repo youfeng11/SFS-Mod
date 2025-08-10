@@ -1,5 +1,20 @@
 package com.youfeng.sfsmod.ui.screen
 
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
@@ -76,6 +91,14 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 
     // region UI事件处理
     val context = LocalActivity.current
+    // 用于从系统设置页返回
+    val installPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = {
+            // 当用户从设置页返回后，通知 ViewModel 刷新并继续流程
+            viewModel.onPermissionResult()
+        }
+    )
     LaunchedEffect(viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -85,10 +108,29 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                 }
 
                 is UiEvent.Vibrate -> context?.vibrate()
+
+                // 跳转到系统设置页
+                is UiEvent.RequestInstallPermission -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        val intent = Intent(
+                            Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                            Uri.parse("package:${context?.packageName}")
+                        )
+                        installPermissionLauncher.launch(intent)
+                    }
+                }
             }
         }
     }
     // endregion
+
+    // 3. 根据状态显示对话框
+    if (uiState is ScreenState.PermissionRequired) {
+        InstallPermissionDialog(
+            onConfirm = { viewModel.requestInstallPermission() },
+            onDismiss = { viewModel.menuStopOnClick() } // 用户取消则停止流程
+        )
+    }
 
     // 基础布局容器
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -98,6 +140,76 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             uiState
         )
     }
+}
+
+@Composable
+fun ClickableTextInCompose(text: String, onClick: () -> Unit) {
+    // 定义一个正则表达式来查找被 ** 包围的文本
+    val regex = Regex("\\*\\*(.*?)\\*\\*")
+    val annotatedString = buildAnnotatedString {
+        var lastIndex = 0
+        // 遍历所有匹配项
+        regex.findAll(text).forEach { matchResult ->
+            val match = matchResult.groups[1]
+            if (match != null) {
+                val startIndex = matchResult.range.first
+                val endIndex = matchResult.range.last + 1
+                val clickableText = match.value
+
+                // 添加 ** 之前
+                append(text.substring(lastIndex, startIndex))
+
+                // 为被 ** 包围的文本添加注解和样式
+                pushStringAnnotation(tag = "CLICKABLE", annotation = clickableText)
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
+                    append(clickableText)
+                }
+                pop() // 弹出注解
+
+                lastIndex = endIndex
+            }
+        }
+
+        // 添加最后一个 ** 之后
+        if (lastIndex < text.length) {
+            append(text.substring(lastIndex))
+        }
+    }
+
+    ClickableText(
+        text = annotatedString,
+        onClick = { offset ->
+            annotatedString.getStringAnnotations(tag = "CLICKABLE", start = offset, end = offset)
+                .firstOrNull()?.let { annotation ->
+                    onClick()
+                }
+        }
+    )
+}
+
+/**
+ * 引导用户开启安装权限的对话框
+ */
+@Composable
+fun InstallPermissionDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.permission_dialog_title)) },
+        text = { ClickableTextInCompose(text = stringResource(R.string.permission_dialog_message), {}) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(stringResource(R.string.permission_dialog_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.permission_dialog_cancel))
+            }
+        }
+    )
 }
 
 // 封装可复用的生命周期观察器
@@ -228,6 +340,8 @@ private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo
             Text(
                 text = when (uiState) {
                     is ScreenState.Stopped -> stringResource(R.string.stopped)
+
+                    is ScreenState.PermissionRequired -> stringResource(R.string.stopped)
 
                     is ScreenState.Done -> stringResource(
                         R.string.done,
