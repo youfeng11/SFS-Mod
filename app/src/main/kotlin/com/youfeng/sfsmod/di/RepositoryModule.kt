@@ -11,6 +11,7 @@ import javax.inject.Singleton
 /**
  * Hilt 模块，用于提供仓库层的依赖关系
  */
+@Suppress("UNUSED_PARAMETER")
 @Module
 @InstallIn(SingletonComponent::class) // 安装在 Application 级别的组件中
 abstract class RepositoryModule {
