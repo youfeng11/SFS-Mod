@@ -280,10 +280,10 @@ private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo
             timer = uiState.timer
             ScreenState.Done(0)
         } else uiState
-        val fixedState = if (state is ScreenState.PermissionRequired) ScreenState.Loading else state
+        val animatedState = if (state is ScreenState.PermissionRequired) ScreenState.Loading else state
 
         AnimatedContent(
-            targetState = fixedState
+            targetState = animatedState
         ) { LoadingIcon(it) }
 
         val errorTextBody = stringResource(
@@ -292,7 +292,7 @@ private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo
         )
 
         AnimatedContent(
-            targetState = fixedState
+            targetState = animatedState
         ) { uiState ->
             Text(
                 text = when (uiState) {
