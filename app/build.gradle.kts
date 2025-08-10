@@ -29,7 +29,7 @@ android {
     defaultConfig {
         applicationId = "com.StefMorojna.SpaceflightSimulator"
         minSdk = 23
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 375
         versionName = "1.5.10.5-3.0.0.RC5"
 
