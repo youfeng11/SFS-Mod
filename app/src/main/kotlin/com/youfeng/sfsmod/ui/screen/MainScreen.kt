@@ -1,7 +1,6 @@
 package com.youfeng.sfsmod.ui.screen
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.LocalActivity
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
@@ -44,13 +42,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -58,6 +53,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.R
 import com.youfeng.sfsmod.data.model.VerifySignatureStates
+import com.youfeng.sfsmod.ui.component.HighlightClickableText
 import com.youfeng.sfsmod.ui.component.OverflowMenu
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 import com.youfeng.sfsmod.ui.viewmodel.ScreenState
@@ -112,7 +108,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         val intent = Intent(
                             Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                            Uri.parse("package:${context?.packageName}")
+                            "package:${context?.packageName}".toUri()
                         )
                         installPermissionLauncher.launch(intent)
                     }
@@ -126,7 +122,8 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     if (uiState is ScreenState.PermissionRequired) {
         InstallPermissionDialog(
             onConfirm = { viewModel.requestInstallPermission() },
-            onDismiss = { viewModel.menuStopOnClick() } // 用户取消则停止流程
+            onDismiss = { viewModel.menuStopOnClick() },
+            onSkip = { viewModel.startResourceCopyProcess() }
         )
     }
 
@@ -140,71 +137,23 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     }
 }
 
-@Composable
-fun ClickableTextInCompose(text: String, onClick: () -> Unit) {
-    // 定义一个正则表达式来查找被 ** 包围的文本
-    val regex = Regex("\\*\\*(.*?)\\*\\*")
-    val annotatedString = buildAnnotatedString {
-        var lastIndex = 0
-        // 遍历所有匹配项
-        regex.findAll(text).forEach { matchResult ->
-            val match = matchResult.groups[1]
-            if (match != null) {
-                val startIndex = matchResult.range.first
-                val endIndex = matchResult.range.last + 1
-                val clickableText = match.value
-
-                // 添加 ** 之前
-                append(text.substring(lastIndex, startIndex))
-
-                // 为被 ** 包围的文本添加注解和样式
-                pushStringAnnotation(tag = "CLICKABLE", annotation = clickableText)
-                withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                ) {
-                    append(clickableText)
-                }
-                pop() // 弹出注解
-
-                lastIndex = endIndex
-            }
-        }
-
-        // 添加最后一个 ** 之后
-        if (lastIndex < text.length) {
-            append(text.substring(lastIndex))
-        }
-    }
-
-    ClickableText(
-        text = annotatedString,
-        onClick = { offset ->
-            annotatedString.getStringAnnotations(tag = "CLICKABLE", start = offset, end = offset)
-                .firstOrNull()?.let { annotation ->
-                    onClick()
-                }
-        }
-    )
-}
-
 /**
  * 引导用户开启安装权限的对话框
  */
 @Composable
 fun InstallPermissionDialog(
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onSkip: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(R.string.permission_dialog_title)) },
         text = {
-            ClickableTextInCompose(
+            HighlightClickableText(
                 text = stringResource(R.string.permission_dialog_message),
-                {})
+                onClickHighlight = onSkip
+            )
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
@@ -331,9 +280,10 @@ private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo
             timer = uiState.timer
             ScreenState.Done(0)
         } else uiState
+        val fixedState = if (state is ScreenState.PermissionRequired) ScreenState.Loading else state
 
         AnimatedContent(
-            targetState = state
+            targetState = fixedState
         ) { LoadingIcon(it) }
 
         val errorTextBody = stringResource(
@@ -342,13 +292,11 @@ private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo
         )
 
         AnimatedContent(
-            targetState = state
+            targetState = fixedState
         ) { uiState ->
             Text(
                 text = when (uiState) {
                     is ScreenState.Stopped -> stringResource(R.string.stopped)
-
-                    is ScreenState.PermissionRequired -> stringResource(R.string.stopped)
 
                     is ScreenState.Done -> stringResource(
                         R.string.done,
@@ -367,13 +315,13 @@ private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo
                         is VerifySignatureStates.SignatureValid -> stringResource(R.string.error_other)
                     }
 
-                    is ScreenState.Loading -> stringResource(R.string.loading)
+                    else -> stringResource(R.string.loading)
                 },
                 modifier = Modifier.animateContentSize(),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge,
                 color = when (uiState) {
-                    is ScreenState.Loading -> Color.Unspecified
+                    is ScreenState.Loading, is ScreenState.PermissionRequired -> Color.Unspecified
                     is ScreenState.Error -> MaterialTheme.colorScheme.error // 错误状态显示红色
                     else -> MaterialTheme.colorScheme.primary // 其他状态显示主题色
                 }

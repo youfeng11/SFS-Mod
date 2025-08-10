@@ -19,7 +19,7 @@
     <string name="done">完成，%d 秒后开始安装</string>
 
     <string name="permission_dialog_title">请前往授予“安装未知应用”权限</string>
-    <string name="permission_dialog_message">在部分设备中，不允许在软件包安装器中被动授予“安装未知应用”权限。\n因此，你必须要主动授权才能安装！\n - 你可以点击 **此处** 忽略授权以继续。\n\n请在点击“去授权”后的设置页面中允许 航天模拟器 “安装未知应用”权限！</string>
+    <string name="permission_dialog_message">在部分设备中，不允许在软件包安装器中被动授予“安装未知应用”权限。\n因此，你必须要主动授权才能安装！\n - 你可以点击 **此处** 跳过授权并继续。\n\n请在点击“去授权”后的设置页面中允许 航天模拟器 “安装未知应用”权限！</string>
     <string name="permission_dialog_confirm">去授权</string>
     <string name="permission_dialog_cancel">取消</string>
 

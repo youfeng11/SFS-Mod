@@ -94,6 +94,10 @@ class MainViewModel @Inject constructor(
             return
         }
 
+        startResourceCopyProcess()
+    }
+
+    fun startResourceCopyProcess() {
         sendState(ScreenState.Loading)
         job = viewModelScope.launch {
             val externalCachePath: Path? = repository.copyResources()
@@ -125,7 +129,6 @@ class MainViewModel @Inject constructor(
         // 再次检查权限
         if (installPermissionRepository.hasInstallPermission()) {
             startCoroutine()
-        } else {
         }
     }
     // endregion
