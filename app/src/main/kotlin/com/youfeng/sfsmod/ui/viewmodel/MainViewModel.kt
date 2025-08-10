@@ -3,8 +3,8 @@ package com.youfeng.sfsmod.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.youfeng.sfsmod.data.model.VerifySignatureStates
-import com.youfeng.sfsmod.data.repository.MainRepository
 import com.youfeng.sfsmod.data.repository.InstallPermissionRepository
+import com.youfeng.sfsmod.data.repository.MainRepository
 import com.youfeng.sfsmod.domain.usecase.CountdownUseCase
 import com.youfeng.sfsmod.domain.usecase.VerifySignatureUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

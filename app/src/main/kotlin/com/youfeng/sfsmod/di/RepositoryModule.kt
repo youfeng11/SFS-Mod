@@ -1,12 +1,12 @@
 package com.youfeng.sfsmod.di
 
+import com.youfeng.sfsmod.data.repository.InstallPermissionRepository
+import com.youfeng.sfsmod.data.repository.InstallPermissionRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import com.youfeng.sfsmod.data.repository.InstallPermissionRepositoryImpl
-import com.youfeng.sfsmod.data.repository.InstallPermissionRepository
 
 /**
  * Hilt 模块，用于提供仓库层的依赖关系

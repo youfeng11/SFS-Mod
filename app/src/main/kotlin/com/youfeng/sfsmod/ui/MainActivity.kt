@@ -22,7 +22,10 @@ class MainActivity : ComponentActivity() {
         }
 
         if (Locale.getDefault().country != "CN") {
-            Log.e(getString(R.string.topbar_title), getString(R.string.not_supported_info, Locale.getDefault().country))
+            Log.e(
+                getString(R.string.topbar_title),
+                getString(R.string.not_supported_info, Locale.getDefault().country)
+            )
             finish()
         }
         setContent {
