@@ -1,13 +1,13 @@
 [versions]
-agp = "8.10.1"
+agp = "8.12.0"
 kotlin = "2.1.21"
-compose-bom = "2025.06.00"
+compose-bom = "2025.07.00"
 core-ktx = "1.16.0"
 ksp = "2.1.21-2.0.1"
 activity-compose = "1.10.1"
-lifecycle = "2.9.1"
-about-libraries = "12.2.1"
-okio = "3.10.2"
+lifecycle = "2.9.2"
+about-libraries = "12.2.4"
+okio = "3.15.0"
 dagger = "2.57"
 hilt = "1.2.0"
 
