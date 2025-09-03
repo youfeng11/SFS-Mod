@@ -1,6 +1,6 @@
 package com.youfeng.sfsmod.domain.usecase
 
-import com.youfeng.sfsmod.data.model.VerifySignatureStates
+import com.youfeng.sfsmod.domain.states.VerifySignatureStates
 import com.youfeng.sfsmod.utils.SignatureUtil
 import com.youfeng.sfsmod.utils.sha256
 import okio.Path

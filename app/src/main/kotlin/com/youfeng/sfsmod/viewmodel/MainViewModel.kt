@@ -1,12 +1,12 @@
-package com.youfeng.sfsmod.ui.viewmodel
+package com.youfeng.sfsmod.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youfeng.sfsmod.data.model.VerifySignatureStates
+import com.youfeng.sfsmod.domain.states.VerifySignatureStates
 import com.youfeng.sfsmod.data.repository.InstallPermissionRepository
 import com.youfeng.sfsmod.data.repository.MainRepository
-import com.youfeng.sfsmod.domain.usecase.CountdownUseCase
 import com.youfeng.sfsmod.domain.usecase.VerifySignatureUseCase
+import com.youfeng.sfsmod.ui.events.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okio.Path
 import javax.inject.Inject
@@ -30,7 +31,6 @@ class MainViewModel @Inject constructor(
     private val repository: MainRepository,
     private val installPermissionRepository: InstallPermissionRepository,
     private val verifySignatureUseCase: VerifySignatureUseCase,
-    private val countdownUseCase: CountdownUseCase
 ) : ViewModel() {
 
     // region 事件流配置
@@ -145,16 +145,13 @@ class MainViewModel @Inject constructor(
     private suspend fun handleCopyResult(result: VerifySignatureStates, apkPath: Path?) {
         if (result is VerifySignatureStates.SignatureValid) {
 
-            countdownUseCase(
-                onTick = { timer ->
-                    sendState(ScreenState.Done(timer))
-                },
-                onFinish = {
-                    if (apkPath != null) {
-                        _uiEvent.trySend(UiEvent.NavigateToInstall(apkPath))
-                    }
-                }
-            )
+            for (timer in 3 downTo 0) {
+                sendState(ScreenState.Done(timer))
+                delay(1000)
+            }
+            if (apkPath != null) {
+                _uiEvent.trySend(UiEvent.NavigateToInstall(apkPath))
+            }
         } else {
             sendState(ScreenState.Error(result))
         }
@@ -165,11 +162,6 @@ class MainViewModel @Inject constructor(
     }
 
     // endregion
-
-    override fun onCleared() {
-        stopCoroutine()
-        super.onCleared()
-    }
 
 }
 
@@ -191,13 +183,4 @@ sealed class ScreenState {
 
     /** 错误状态（携带具体错误类型） */
     data class Error(val errorType: VerifySignatureStates) : ScreenState()
-}
-
-/**
- * UI事件类型定义
- */
-sealed class UiEvent {
-    data class NavigateToInstall(val apkPath: Path) : UiEvent()
-    data object Vibrate : UiEvent()
-    data object RequestInstallPermission : UiEvent()
 }

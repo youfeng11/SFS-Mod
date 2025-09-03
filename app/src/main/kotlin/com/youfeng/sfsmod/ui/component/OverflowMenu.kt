@@ -21,7 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.youfeng.sfsmod.R
-import com.youfeng.sfsmod.ui.viewmodel.ScreenState
+import com.youfeng.sfsmod.viewmodel.ScreenState
 
 /**
  * 右上角溢出菜单组件

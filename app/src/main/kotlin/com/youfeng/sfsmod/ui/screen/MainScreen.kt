@@ -52,12 +52,12 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.R
-import com.youfeng.sfsmod.data.model.VerifySignatureStates
+import com.youfeng.sfsmod.domain.states.VerifySignatureStates
 import com.youfeng.sfsmod.ui.component.HighlightClickableText
 import com.youfeng.sfsmod.ui.component.OverflowMenu
-import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
-import com.youfeng.sfsmod.ui.viewmodel.ScreenState
-import com.youfeng.sfsmod.ui.viewmodel.UiEvent
+import com.youfeng.sfsmod.viewmodel.MainViewModel
+import com.youfeng.sfsmod.viewmodel.ScreenState
+import com.youfeng.sfsmod.ui.events.UiEvent
 import com.youfeng.sfsmod.utils.DeviceInfo
 import com.youfeng.sfsmod.utils.installApk
 import com.youfeng.sfsmod.utils.vibrate

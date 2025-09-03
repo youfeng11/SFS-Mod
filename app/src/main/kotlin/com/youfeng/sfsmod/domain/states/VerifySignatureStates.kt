@@ -1,4 +1,4 @@
-package com.youfeng.sfsmod.data.model
+package com.youfeng.sfsmod.domain.states
 
 // 对比签名结果
 sealed class VerifySignatureStates {
