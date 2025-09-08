@@ -31,8 +31,8 @@ android {
         applicationId = "com.StefMorojna.SpaceflightSimulator"
         minSdk = 23
         targetSdk = 36
-        versionCode = 375
-        versionName = "1.5.10.5-3.0.0.RC6"
+        versionCode = 389
+        versionName = "1.5.10.6-3.0.0.RC7"
 
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
