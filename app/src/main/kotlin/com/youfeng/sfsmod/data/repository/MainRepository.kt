@@ -20,7 +20,7 @@ interface Repository {
  */
 @Singleton
 class MainRepository @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : Repository {
     private val fileSystem = FileSystem.SYSTEM
 

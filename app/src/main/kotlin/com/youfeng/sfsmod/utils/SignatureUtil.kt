@@ -16,7 +16,7 @@ import javax.inject.Inject
  * @property context 应用上下文，用于访问包管理服务
  */
 class SignatureUtil @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) {
 
     /**

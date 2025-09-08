@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Properties
@@ -33,15 +34,10 @@ android {
         versionCode = 375
         versionName = "1.5.10.5-3.0.0.RC6"
 
-        vectorDrawables {
-            useSupportLibrary = true
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
 
-        ndk {
-            abiFilters.clear()
-            abiFilters.add("arm64-v8a")
-            abiFilters.add("armeabi-v7a")
-        }
     }
 
     signingConfigs {
@@ -66,8 +62,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlinOptions {
-        jvmTarget = "21"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
     }
 
     buildTypes {

@@ -12,7 +12,7 @@ interface InstallPermissionRepository {
 
 @Singleton
 class InstallPermissionRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : InstallPermissionRepository {
 
     override fun hasInstallPermission(): Boolean =
