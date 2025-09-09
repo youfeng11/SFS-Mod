@@ -101,7 +101,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                     context?.finish()
                 }
 
-                is UiEvent.Vibrate -> context?.vibrate()
+                is UiEvent.Vibrate -> context?.vibrate(event.time)
 
                 // 跳转到系统设置页
                 is UiEvent.RequestInstallPermission -> {

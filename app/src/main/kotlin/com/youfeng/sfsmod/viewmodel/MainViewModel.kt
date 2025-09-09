@@ -91,6 +91,9 @@ class MainViewModel @Inject constructor(
         // 检查权限
         if (!installPermissionRepository.hasInstallPermission()) {
             sendState(ScreenState.PermissionRequired)
+            viewModelScope.launch {
+                _uiEvent.send(UiEvent.Vibrate(150))
+            }
             return
         }
 
@@ -102,7 +105,7 @@ class MainViewModel @Inject constructor(
         job = viewModelScope.launch {
             val externalCachePath: Path? = repository.copyResources()
             val result = verifySignatureUseCase(externalCachePath)
-            _uiEvent.send(UiEvent.Vibrate) // 操作完成触发振动反馈
+            _uiEvent.send(UiEvent.Vibrate()) // 操作完成触发振动反馈
             handleCopyResult(result, externalCachePath)
         }
     }

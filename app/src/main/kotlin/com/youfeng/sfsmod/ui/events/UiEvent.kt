@@ -7,6 +7,6 @@ import okio.Path
  */
 sealed class UiEvent {
     data class NavigateToInstall(val apkPath: Path) : UiEvent()
-    data object Vibrate : UiEvent()
+    data class Vibrate(val time: Long = 250) : UiEvent()
     data object RequestInstallPermission : UiEvent()
 }
