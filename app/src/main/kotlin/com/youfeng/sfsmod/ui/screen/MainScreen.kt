@@ -55,12 +55,12 @@ import com.youfeng.sfsmod.R
 import com.youfeng.sfsmod.domain.states.VerifySignatureStates
 import com.youfeng.sfsmod.ui.component.HighlightClickableText
 import com.youfeng.sfsmod.ui.component.OverflowMenu
-import com.youfeng.sfsmod.viewmodel.MainViewModel
-import com.youfeng.sfsmod.viewmodel.ScreenState
 import com.youfeng.sfsmod.ui.events.UiEvent
 import com.youfeng.sfsmod.utils.DeviceInfo
 import com.youfeng.sfsmod.utils.installApk
 import com.youfeng.sfsmod.utils.vibrate
+import com.youfeng.sfsmod.viewmodel.MainViewModel
+import com.youfeng.sfsmod.viewmodel.ScreenState
 
 /**
  * 主界面入口，实现：
@@ -280,7 +280,8 @@ private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo
             timer = uiState.timer
             ScreenState.Done(0)
         } else uiState
-        val animatedState = if (state is ScreenState.PermissionRequired) ScreenState.Loading else state
+        val animatedState =
+            if (state is ScreenState.PermissionRequired) ScreenState.Loading else state
 
         AnimatedContent(
             targetState = animatedState

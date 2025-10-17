@@ -2,19 +2,19 @@ package com.youfeng.sfsmod.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youfeng.sfsmod.domain.states.VerifySignatureStates
 import com.youfeng.sfsmod.data.repository.InstallPermissionRepository
 import com.youfeng.sfsmod.data.repository.MainRepository
+import com.youfeng.sfsmod.domain.states.VerifySignatureStates
 import com.youfeng.sfsmod.domain.usecase.VerifySignatureUseCase
 import com.youfeng.sfsmod.ui.events.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okio.Path
 import javax.inject.Inject
