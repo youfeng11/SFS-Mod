@@ -32,9 +32,10 @@ android {
         minSdk = 23
         targetSdk = 36
         versionCode = 389
-        versionName = "1.5.10.6-3.0.0.RC7"
+        versionName = "1.5.10.6-3.0.0"
 
         ndk {
+            //noinspection ChromeOsAbiSupport
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
 
