@@ -31,7 +31,7 @@ android {
         applicationId = "com.StefMorojna.SpaceflightSimulator"
         minSdk = 23
         targetSdk = 36
-        versionCode = 412
+        versionCode = 551
         versionName = "1.5.10.6-3.0.0"
 
         ndk {
