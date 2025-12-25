@@ -21,7 +21,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.youfeng.sfsmod.R
-import com.youfeng.sfsmod.viewmodel.ScreenState
+import com.youfeng.sfsmod.ui.state.AppState
+import com.youfeng.sfsmod.ui.state.UiState
 
 /**
  * 右上角溢出菜单组件
@@ -34,7 +35,7 @@ import com.youfeng.sfsmod.viewmodel.ScreenState
 fun OverflowMenu(
     menuRestartOnClick: () -> Unit,
     menuStopOnClick: () -> Unit,
-    uiState: ScreenState
+    uiState: UiState
 ) {
     // region 状态管理
     var menuExpanded by remember { mutableStateOf(false) }
@@ -56,8 +57,8 @@ fun OverflowMenu(
     ) {
         // 动态切换的操作项
         AnimatedContent(
-            targetState = uiState is ScreenState.Loading
-                    || uiState is ScreenState.Done,
+            targetState = uiState.appState is AppState.Loading
+                    || uiState.appState is AppState.Done,
         ) { isRunning ->
             MenuItem(
                 text = stringResource(if (isRunning) R.string.menu_stop else R.string.menu_restart),

@@ -11,11 +11,11 @@
     <string name="not_supported_info">仅支持在中国大陆地区使用，你所在的地区（%s）不支持！</string>
 
     <string name="stopped">安装已停止\n在右上角菜单中重启</string>
-    <string name="error_sign">签名不一致，安装无法进行！\n安装器可能被篡改，请从官方渠道（应用关于内的QQ群或123网盘）重新下载！</string>
-    <string name="error_none_this_signature">无法获取当前应用签名信息</string>
-    <string name="error_none_apk_signature">无法获取目标APK签名信息</string>
-    <string name="error_other">其他错误</string>
-    <string name="error_none_body">出现了一些问题，或安装器被破坏，请尝试从官方渠道重新下载安装！\n若问题无法解决，请求助开发者！\n设备信息：%s</string>
+    <string name="error_info">%1$s\n请重试或从官方渠道重新下载！\n若问题无法解决，请求助开发者！\n设备信息：%2$s</string>
+    <string name="error_signature_mismatch">签名不一致，安装无法进行！</string>
+    <string name="error_null_this_signature">无法获取当前应用签名信息！</string>
+    <string name="error_null_apk_signature">无法获取目标APK签名信息！</string>
+    <string name="error_unknown">未知错误！\n%s</string>
     <string name="done">完成，%d 秒后开始安装</string>
 
     <string name="permission_dialog_title">请前往授予“安装未知应用”权限</string>

@@ -74,6 +74,7 @@ lint/tmp/
 
 # AndroidIDE
 .androidide/
+.acside
 
 # Kotlin
 .kotlin/

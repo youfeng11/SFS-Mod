@@ -2,6 +2,8 @@ package com.youfeng.sfsmod.di
 
 import com.youfeng.sfsmod.data.repository.InstallPermissionRepository
 import com.youfeng.sfsmod.data.repository.InstallPermissionRepositoryImpl
+import com.youfeng.sfsmod.data.repository.MainRepository
+import com.youfeng.sfsmod.data.repository.MainRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -21,9 +23,13 @@ abstract class RepositoryModule {
      * 当有地方需要 @Inject InstallPermissionRepository 时，Hilt 会自动提供一个 InstallPermissionRepositoryImpl 的实例
      */
     @Binds
-    @Singleton
     abstract fun bindInstallPermissionRepository(
         installPermissionRepositoryImpl: InstallPermissionRepositoryImpl
     ): InstallPermissionRepository
+
+    @Binds
+    abstract fun bindMainRepository(
+        mainRepositoryImpl: MainRepositoryImpl
+    ): MainRepository
 
 }

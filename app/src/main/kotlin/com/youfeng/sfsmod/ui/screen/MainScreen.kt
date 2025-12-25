@@ -30,9 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -48,19 +46,20 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.R
-import com.youfeng.sfsmod.domain.states.VerifySignatureStates
+import com.youfeng.sfsmod.domain.state.VerifySignatureState
 import com.youfeng.sfsmod.ui.component.HighlightClickableText
 import com.youfeng.sfsmod.ui.component.OverflowMenu
-import com.youfeng.sfsmod.ui.events.UiEvent
-import com.youfeng.sfsmod.utils.DeviceInfo
-import com.youfeng.sfsmod.utils.installApk
-import com.youfeng.sfsmod.utils.vibrate
-import com.youfeng.sfsmod.viewmodel.MainViewModel
-import com.youfeng.sfsmod.viewmodel.ScreenState
+import com.youfeng.sfsmod.ui.event.UiEvent
+import com.youfeng.sfsmod.util.DeviceInfo
+import com.youfeng.sfsmod.util.installApk
+import com.youfeng.sfsmod.util.vibrate
+import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
+import com.youfeng.sfsmod.ui.state.AppState
+import com.youfeng.sfsmod.ui.state.UiState
 
 /**
  * 主界面入口，实现：
@@ -72,7 +71,7 @@ import com.youfeng.sfsmod.viewmodel.ScreenState
  */
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
-    val uiState by viewModel.state.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
 
     // region 生命周期管理
@@ -119,11 +118,11 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     // endregion
 
     // 3. 根据状态显示对话框
-    if (uiState is ScreenState.PermissionRequired) {
+    if (uiState.showInstallPermissionDialog) {
         InstallPermissionDialog(
-            onConfirm = { viewModel.requestInstallPermission() },
-            onDismiss = { viewModel.menuStopOnClick() },
-            onSkip = { viewModel.startResourceCopyProcess() }
+            onConfirm = { viewModel.onConfirmInstallPermissionDialog() },
+            onDismiss = { viewModel.onDismissInstallPermissionDialog() },
+            onSkip = { viewModel.onSkipInstallPermission() }
         )
     }
 
@@ -174,17 +173,12 @@ fun LifecycleAwareHandler(
     onStart: () -> Unit,
     onStop: () -> Unit
 ) {
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    DisposableEffect(lifecycle) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_START -> onStart()
-                Lifecycle.Event.ON_STOP -> onStop()
-                else -> {}
-            }
-        }
-        lifecycle.addObserver(observer)
-        onDispose { lifecycle.removeObserver(observer) }
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        onStart()
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
+        onStop()
     }
 }
 
@@ -197,9 +191,9 @@ fun LifecycleAwareHandler(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainLayout(
-    menuRestartOnClick: () -> Unit,
-    menuStopOnClick: () -> Unit,
-    uiState: ScreenState
+    menuRestartOnClick: () -> Unit = {},
+    menuStopOnClick: () -> Unit = {},
+    uiState: UiState = UiState()
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -237,7 +231,7 @@ private fun MainLayout(
 @Composable
 private fun ContentArea(
     modifier: Modifier = Modifier,
-    uiState: ScreenState
+    uiState: UiState
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -273,57 +267,41 @@ private fun VersionInfo() {
  * - 状态文本描述
  */
 @Composable
-private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo.DeviceInfoString) {
+private fun LoadingSection(uiState: UiState, deviceInfo: String = DeviceInfo.DeviceInfoString) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        var timer by remember { mutableIntStateOf(0) }
-        val state = if (uiState is ScreenState.Done) {
-            timer = uiState.timer
-            ScreenState.Done(0)
-        } else uiState
-        val animatedState =
-            if (state is ScreenState.PermissionRequired) ScreenState.Loading else state
+        val state = when (uiState.appState) {
+            is AppState.Done -> AppState.Done(0)
+            else -> uiState.appState
+        }
 
         AnimatedContent(
-            targetState = animatedState
+            targetState = state
         ) { LoadingIcon(it) }
 
-        val errorTextBody = stringResource(
-            R.string.error_none_body,
-            deviceInfo
-        )
-
         AnimatedContent(
-            targetState = animatedState
-        ) { uiState ->
+            targetState = state
+        ) { appState ->
             Text(
-                text = when (uiState) {
-                    is ScreenState.Stopped -> stringResource(R.string.stopped)
+                text = when (appState) {
+                    is AppState.Stopped -> stringResource(R.string.stopped)
 
-                    is ScreenState.Done -> stringResource(
+                    is AppState.Done -> stringResource(
                         R.string.done,
-                        timer
+                        uiState.appState.let {
+                            if (it is AppState.Done) it.timer else 0
+                        }
                     )
 
-                    is ScreenState.Error -> when (uiState.errorType) {
-                        is VerifySignatureStates.SignatureMismatch -> stringResource(R.string.error_sign)
+                    is AppState.Error -> stringResource(R.string.error_info, appState.errorText.asString(), deviceInfo)
 
-                        is VerifySignatureStates.SignatureUnavailablePath -> "${stringResource(R.string.error_other)}\n$errorTextBody"
-
-                        is VerifySignatureStates.SignatureUnavailableThis -> "${stringResource(R.string.error_none_this_signature)}\n$errorTextBody"
-
-                        is VerifySignatureStates.SignatureUnavailableApk -> "${stringResource(R.string.error_none_apk_signature)}\n$errorTextBody"
-
-                        is VerifySignatureStates.SignatureValid -> stringResource(R.string.error_other)
-                    }
-
-                    else -> stringResource(R.string.loading)
+                    is AppState.Loading -> stringResource(R.string.loading)
                 },
                 modifier = Modifier.animateContentSize(),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge,
-                color = when (uiState) {
-                    is ScreenState.Loading, is ScreenState.PermissionRequired -> Color.Unspecified
-                    is ScreenState.Error -> MaterialTheme.colorScheme.error // 错误状态显示红色
+                color = when (appState) {
+                    is AppState.Loading -> Color.Unspecified
+                    is AppState.Error -> MaterialTheme.colorScheme.error // 错误状态显示红色
                     else -> MaterialTheme.colorScheme.primary // 其他状态显示主题色
                 }
             )
@@ -338,11 +316,11 @@ private fun LoadingSection(uiState: ScreenState, deviceInfo: String = DeviceInfo
  * - 加载中：显示进度条
  */
 @Composable
-private fun LoadingIcon(uiState: ScreenState) {
+private fun LoadingIcon(uiState: AppState) {
     val iconData = when (uiState) {
-        is ScreenState.Stopped -> Icons.Filled.Close to MaterialTheme.colorScheme.primary
-        is ScreenState.Done -> Icons.Filled.Done to MaterialTheme.colorScheme.primary
-        is ScreenState.Error -> Icons.Filled.Warning to MaterialTheme.colorScheme.error
+        is AppState.Stopped -> Icons.Filled.Close to MaterialTheme.colorScheme.primary
+        is AppState.Done -> Icons.Filled.Done to MaterialTheme.colorScheme.primary
+        is AppState.Error -> Icons.Filled.Warning to MaterialTheme.colorScheme.error
         else -> null
     }
 
@@ -362,50 +340,28 @@ private fun LoadingIcon(uiState: ScreenState) {
 
 
 // UI预览
-
-@Composable
-private fun PreviewContainer(screenState: ScreenState) {
-    MainLayout({}, {}, screenState)
-}
-
+/*
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutLoadingPreview() {
-    PreviewContainer(ScreenState.Loading)
+    MainLayout(uiState = AppState.Loading)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutStoppedPreview() {
-    PreviewContainer(ScreenState.Stopped)
+    MainLayout(uiState = AppState.Stopped)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutDonePreview() {
-    PreviewContainer(ScreenState.Done(3))
+    MainLayout(uiState = AppState.Done(3))
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutErrorSignatureMismatchPreview() {
-    PreviewContainer(ScreenState.Error(VerifySignatureStates.SignatureMismatch))
+    MainLayout(uiState = AppState.Error(VerifySignatureState.SignatureMismatch))
 }
-
-@Preview(showBackground = true)
-@Composable
-fun MainLayoutErrorSignatureUnavailablePathPreview() {
-    PreviewContainer(ScreenState.Error(VerifySignatureStates.SignatureUnavailablePath))
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainLayoutErrorSignatureUnavailableThisPreview() {
-    PreviewContainer(ScreenState.Error(VerifySignatureStates.SignatureUnavailableThis))
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainLayoutErrorSignatureUnavailableApkPreview() {
-    PreviewContainer(ScreenState.Error(VerifySignatureStates.SignatureUnavailableApk))
-}
+*/
