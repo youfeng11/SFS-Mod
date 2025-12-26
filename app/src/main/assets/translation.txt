@@ -22,7 +22,7 @@
 
 # 在Gitee查看：https://gitee.com/YouFeng11/SFS-zh-CN-Translation
 
-# 版本：2025.02.12
+# 版本：2025.12.26
 # 警告⚠️：
 #   该汉化是基于 MIT License 发布的开源作品，版权所有！
 #   除非你知道你应该怎么做，否则请不要将本作品在修改后传播！
@@ -60,6 +60,10 @@
 
     Development_Preview=开发预览
     Development_Preview_Explanation=开发预览展示了我们正在开发的未来更新
+
+    Mod_Loader_OpenButton=Mod 加载器
+    Download_Mods=下载 Mods
+    Open_Mods_Folder=打开 Mods 文件夹
 
     Community_OpenButton=社区
     Community_Youtube=Youtube
@@ -116,6 +120,7 @@
 
     Exit_Button=退出
     Close_Game=确定关闭游戏吗？
+    Follow_Development=关注开发
 
 [Worlds Menu]
     Create_New_World_Button=新建世界
@@ -147,9 +152,14 @@
     Allow_Quicksaves_Label=允许快速存档
 
     World_Difficulty_Name=难度：%value%
+    Difficulty_Easy=简单
     Difficulty_Normal=普通
     Difficulty_Hard=困难
+    Difficulty_Medium=中等
+    Difficulty_Extreme=极端
     Difficulty_Realistic=现实
+
+    World_SolarSystem_Name=星系：%value%
 
     Last_Played=最后游玩：%value%前
     Just_Played=最后游玩：刚刚
@@ -193,7 +203,8 @@
     Import=导入
     Delete=删除
     Rename=重命名
-    Delete_File_With_Type=确定删除%filename%%filetype{1}%吗
+    Create=创建
+    Delete_File_With_Type=确定删除%filename%%filetype%吗
 
 # In progress
     Saving_In_Progress=保存中...
@@ -201,42 +212,44 @@
     Importing_In_Progress=导入中...
 
 # filetype (injected)
-    Blueprint{0}=蓝图
-    Blueprint{1}=蓝图
-    Blueprint{2}=蓝图
-    Quicksave{0}=快速存档
-    Quicksave{1}=快速存档
-    Quicksave{2}=快速存档
+    Blueprint=蓝图
+    Quicksave=快速存档
 
 # Ask overwrite menu
-    File_Already_Exists=已存在此名称的%filetype{1}%
-    Overwrite_File=覆盖%filetype{1}%
-    New_File=新的%filetype{1}%
+    File_Already_Exists=已存在此名称的%filetype%
+    Overwrite_File=覆盖%filetype%
+    New_File=新的%filetype%
 
 # Load failure
-    Load_Failed=无法从%filepath%加载%filetype{1}%
+    Load_Failed=无法从%filepath%加载%filetype%
 
 [Purchasing]
     Open_Shop_Menu=拓展包
     Open_Shop_Menu_2=打开商店
+    Expansions_List_Title=拓展包
+    Bundles_List_Title=捆绑包
     Parts_Expansion=部件拓展包
+    Expand_View_Button=展开视图
     Redstone_Atlas_Pack=红石式宇宙神包
     Skins_Expansion=皮肤拓展包
-    Planets_Expansion=星球拓展包
+    Gas_Giants_Expansion=气态巨行星拓展包
+    Ice_Giants_Expansion=冰态巨行星拓展包
     Cheats_Expansion=作弊选项
     Infinite_Area_Expansion=无限建造面积
     Builder_Bundle=建造捆绑包
     Sandbox_Bundle=沙盒捆绑包
     Full_Bundle=完整捆绑包
     Upgrade_To_Full_Bundle=升级至完整捆绑包
+    Most_Popular_Purchase=最受欢迎！
+    No_Connection=[无连接]
+
     Mac_Full_Version=完整版
-
-    Not_All_Parts_Are_Owned=并非所有部件都已拥有
-    Not_All_Parts_Are_Owned=已禁用未拥有的部件
-    Not_All_Parts_Are_Owned=
-    Not_All_Parts_Are_Owned=查看部件拓展包？
-
     View_Part_Expansion=查看拓展包
+
+    Not_All_Parts_Are_Owned_Full_Version=并非所有部件都已拥有
+    Not_All_Parts_Are_Owned_Full_Version=已禁用未拥有的部件
+    Not_All_Parts_Are_Owned_Full_Version=
+    Not_All_Parts_Are_Owned_Full_Version=查看部件拓展包？
 
     More_Parts=查看部件拓展包
     More_Skins=查看皮肤拓展包
@@ -258,7 +271,6 @@
     Purchase_Thanks_Msg=现在就去探索群星吧！
 
     Owned=%product%（已拥有）
-
     Restore_Open=恢复购买
 
 # Parts Expansion
@@ -277,11 +289,21 @@
 
 # Planets Expansion
     PlanetsExpansion_Jupiter=探索木星及其四颗卫星！
-    PlanetsExpansion_Callisto=从木卫四布满陨石坑的地表！
-    PlanetsExpansion_Europa=再到木卫二广袤的冰原！
+    PlanetsExpansion_Jupiter=从木卫四布满陨石坑的地表，再到木卫二广袤的冰原！
 
-    PlanetsExpansion_Conclusion=遥远的世界在等着你
-    PlanetsExpansion_Conclusion=去探索它们吧！
+    PlanetsExpansion_Saturn=造访土星，欣赏其壮观的光环与多样的卫星！
+    PlanetsExpansion_SaturnMoons=着陆在土卫六的甲烷海洋中，见证土卫二的间歇泉！
+
+    PlanetsExpansion_Uranus=探索冰巨星天王星及其崎岖的卫星。
+    PlanetsExpansion_Uranus=探索天卫五高耸的悬崖与天卫一的冰原！
+
+    PlanetsExpansion_Neptune=前往遥远的冰巨星海王星，造访被捕获的卫星——海卫一！
+
+    PlanetsExpansion_Pluto=造访冥王星及其双星卫星卡戎。
+    PlanetsExpansion_Pluto=着陆在这些遥远寒冷世界的冰冷景观和山脉上！
+
+# Full bundle
+    FullBundle_Description=以折扣价获取所有拓展包！
 
 [Sharing]
     Share_Button=分享蓝图
@@ -295,6 +317,7 @@
     Upload_Fail=蓝图上传失败
     Copied_URL_To_Clipboard=复制蓝图URL至剪贴板
     Sharing_Enter_Prompt=选择要将蓝图加载到的世界
+    Must_Create_World_Download_BP=你必须创建一个世界才能下载蓝图
     Confirm_Download_Button=下载蓝图
     Downloading_Message=下载中...
     Download_Fail=蓝图下载失败
@@ -312,6 +335,12 @@
     Shakes_Name=视角摇晃
     Orbit_Line_Count=轨道线数
     Anti_Aliasing=抗锯齿
+    Set_Save_Location=设置保存位置
+    Change_Save_Location=更改保存位置
+    Open_Save_Location=打开保存位置
+
+    Current_Save_Location=当前保存位置：
+    Current_Save_Location=%path%
 
 [Cheats]
     Infinite_Build_Area_Name=无限建造面积
@@ -323,13 +352,14 @@
     No_Heat_Damage_Name=无热损伤
     No_Burn_Marks_Name=无燃烧痕迹
     Refill_Fuel_Tanks=加注燃料箱
+    Refilled_Tanks=加注全部燃料箱
     Unlock_Cheats_Button=解锁作弊
 
-    Unlock_Cheats_Warning=启用作弊功能会将您的挑战世界转变为沙盒世界。
+    Unlock_Cheats_Warning=启用作弊功能会将你的挑战世界转变为沙盒世界。
     Unlock_Cheats_Warning=
     Unlock_Cheats_Warning=此更改无法撤销。
     Unlock_Cheats_Warning=
-    Unlock_Cheats_Warning=您确定要继续吗？
+    Unlock_Cheats_Warning=你确定要继续吗？
 
 [Tutorials]
 
@@ -339,9 +369,45 @@
     Tut_Part_Info=单击查看
     Tut_Part_Info=部件信息
 
-    Tut_Use_Part=单击部件以使用它们
+    Tut_Use_Part=点击发动机将其启动！
+    Tut_Use_Part=（单击部件以使用它们）
+
+    Tut_Retry=修改火箭
+    Tut_Retry=然后重新发射？
+
     Tut_Ignition=点火！
+
     Tut_Throttle=调整油门
+    Tut_Throttle=至 100%
+
+    Tut_Double_Click=双击选择
+    Tut_Double_Click=所有连接部件
+
+    Tut_Symmetry_Mode=对称模式
+    Tut_Area_Select=长按，然后拖动进行区域选择
+
+    Tut_Stages=阶段系统允许你
+    Tut_Stages=同时激活多个部件
+
+    Tut_Parachute=使用降落伞让
+    Tut_Parachute=宇航员在飞行结束时
+    Tut_Parachute=安全着陆
+
+    Tut_Capsule=小型太空舱
+    Tut_Capsule=内有一名宇航员
+
+    Tut_Separator=使用分离器
+    Tut_Separator=在燃料耗尽时
+    Tut_Separator=分离各个阶段
+
+    Tut_Fuel_Tanks=燃料箱
+    Tut_Rocket_Engines=火箭发动机
+    Tut_Example_Rockets=示例火箭
+    Tut_Infinite_Area=可在作弊选项中
+    Tut_Infinite_Area=启用无限建造面积
+
+    Tut_No_Fuel_Source=发动机没有
+    Tut_No_Fuel_Source=燃料来源
 
 [Hub]
     Funds_Text=资金：%funds%
@@ -349,16 +415,29 @@
     Exit_To_Space_Center=返回航天中心
     Research_And_Development=研究与发展 %complete%/%total%
     Challenges_Info=成就：%complete%/%total%
-    Challenges_Button=成就：%complete%/%total%
+    Challenges_Button=成就 %complete%/%total%
     Challenges_Title=成就：
 
     Challenges_Completed=<size=55>成就已完成：</size>
     Challenges_Completed=%challenge%
 
+    This_Is_Challenging_Game=这是一款富有挑战性的游戏
+    This_Is_Challenging_Game=需要耐心和毅力
+
+    Rocket_Science_Is_Hard=火箭科学并不简单
+    Dont_Give_Up=不要放弃，坚持下去，你会成功的！
+    New_Part_Unlock_Available=有新的部件可解锁
+    Insufficient_Funds=资金不足
+
 [Build]
     Build_New_Rocket=新建火箭
     New=新建
     Expand_Last_Rocket=继续建造
+
+    Not_All_Parts_Owned=并非所有部件都已拥有
+    Not_All_Parts_Owned=已禁用未拥有的部件
+    Not_All_Parts_Owned=
+    Not_All_Parts_Owned=查看完整版？
 
     Symmetry_On=对称：开
     Symmetry_Off=对称：关
@@ -372,6 +451,7 @@
 # Clear build area
     Clear_Warning=确定清空建造区域吗？
     Clear_Confirm=清空
+    Auto_Detach_Capsule=自动分离太空舱
 
 # Launch warnings
     Warnings_Title=警告：
@@ -391,7 +471,7 @@
     Launch_Vertically_Confirm=垂直发射
 
 # Example rockets
-    Example_Rockets_OpenMenu=实例火箭
+    Example_Rockets_OpenMenu=示例火箭
     Basic_Rocket=基础火箭
     Stages=二级火箭
     Ideal_Stages=三级火箭
@@ -401,7 +481,7 @@
     Toggle_Map_Button=地图
     Escape=逃逸
     Encounter=相遇
-    Rendezvous=会和
+    Rendezvous=交会
     Transfer=转移窗口
 
 [Game]
@@ -409,6 +489,7 @@
     Throttle_Off=关
     Ignition=点火
     RCS=RCS
+    Rocket_Has_No_RCS=你的火箭没有RCS推进器
 
 # Game supports screen rotation, we split into 2 lines in vertical mode
     Height_Terrain_Vertical=高度（对地）：
@@ -457,8 +538,47 @@
 [Failure menu]
     Failure_Cause=失败原因：
     Failure_Crash_Into_Rocket=撞上另一枚火箭
-    Failure_Crash_Into_Terrain=在%planet{1}%表面坠毁
+    Failure_Crash_Into_The_Ocean=坠入大海
     Failure_Burn_Up=在进入大气时被烧毁
+
+[Dynamic_Planet_Specific]
+    Failure_Crash_Into_Terrain=在%planet{1}%表面坠毁
+    LandAndReturn_Title=%planet{0}%着陆
+    LandAndReturn=着陆在%planet{0}%表面，然后安全返回
+    Survived_Reentry=Reentered %planet{3}% atmosphere, max temperature %temperature%
+
+    Reached_Low_Orbit=到达%planet{0}%低轨道
+    Reached_High_Orbit=到达%planet{0}%高轨道
+    Descend_Low_Orbit=下降至%planet{0}%低轨道
+    Capture_Low_Orbit=被捕获至%planet{0}%低轨道
+    Capture_High_Orbit=捕获至%planet{0}%高轨道
+
+    Entered_Lower_Atmosphere=进入%planet{3}%低层大气
+    Entered_Upper_Atmosphere=进入%planet{3}%高层大气
+    Left_Lower_Atmosphere=到达%planet{3}%高层大气
+    Left_Upper_Atmosphere=脱离%planet{3}%大气
+
+    Landed=着陆在%planet{1}%表面
+
+    Landed_At_Landmark=着陆在%planet{1}%表面
+    Landed_At_Landmark=<size=55>地标：%landmark%</size>
+
+    Landed_At_Landmark__Short=着陆在%planet{1}%表面
+    Landed_At_Landmark__Short=- %landmark% -
+
+    Crashed_Into_Terrain=坠毁在%planet{1}%表面
+
+    Entered_SOI=进入%planet{1}%引力范围
+    Escaped_SOI=脱离%planet{1}%引力范围
+
+    Docked_Suborbital=在%planet{1}%亚轨道对接
+    Docked_Orbit_Low=在%planet{1}%低轨道对接
+    Docked_Orbit_Transfer=在%planet{1}%转移轨道对接
+    Docked_Orbit_High=在%planet{1}%高轨道对接
+    Docked_Escape=在%planet{1}%逃逸轨道对接
+    Docked_Surface=在%planet{1}%地表对接
+
+    Recover_Home=安全返回%planet{1}%
 
 [End mission menu]
     Recover_Rocket=回收
@@ -482,7 +602,7 @@
     Revert_3_Min=还原3分钟
 
 # End mission menu
-    End_Challenges_Title=成就：
+    End_Challenges_Title=已完成成就：
     End_Logs_Title=任务日志：
     Continue_To_Log=继续
     Back_To_Challenges=返回
@@ -494,6 +614,7 @@
 
     Clear_Debris_Confirm=清除残骸
 
+# Select menu
     Navigate_To=导航
     End_Navigation=结束导航
     Focus=聚焦
@@ -512,8 +633,9 @@
     Cannot_Timewarp_Below_Basic=无法在%height%以下进行时间加速
     Cannot_Timewarp_Below=无法在%height%以下进行%speed%倍以上的时间加速
     Cannot_Timewarp_While_Moving_On_Surface=无法在地表移动时进行%speed%倍以上的时间加速
+    Cannot_Timewarp_While_Moving_Water=无法在水中移动时进行%speed%倍以上的时间加速
     Cannot_Timewarp_While_Accelerating=无法在加速状态下进行%speed%倍以上的时间加速
-    Cannot_Use_Part_While_Timewarping=无法在时间加速时使用%part{1}%
+    Cannot_Use_Part_While_Timewarping=无法在时间加速时使用%part%
     Cannot_Turn_While_Timewarping=无法在时间加速时转向
 
     Timewarp_To_Button=时间加速至此
@@ -521,6 +643,7 @@
 [Units]
     Thrust_To_Weight_Ratio=推力/重量：%value%
     Mass=质量：%value%吨
+    Density=密度：%value%
     Thrust=推力：%value%吨
     Burn_Time=燃烧时间：%value%秒
     Efficiency=效率：%value%比冲
@@ -536,16 +659,14 @@
     Day_Short=%value%天
 
 [Resource Types]
-    Solid_Fuel{0}=固体燃料
-    Solid_Fuel{1}=固体燃料
-    Liquid_Fuel{0}=液体燃料
-    Liquid_Fuel{1}=液体燃料
+    Solid_Fuel=固体燃料
+    Liquid_Fuel=液体燃料
 
 [Resource Uses]
-    Resource_Bars_Title=%resource_name{0}%：
-    Info_Resource_Amount=%resource{0}%：%amount%
-    Msg_No_Resource_Source=无%resource{1}%来源
-    Msg_No_Resource_Left=%resource{1}%不足
+    Resource_Bars_Title=%resource_name%：
+    Info_Resource_Amount=%resource%：%amount%
+    Msg_No_Resource_Source=无%resource%来源
+    Msg_No_Resource_Left=%resource%不足
 
 [Part Categories]
     Basic_Parts=基础
@@ -558,65 +679,50 @@
     Fairings_Parts=整流罩
     Structural_Parts=结构
     Other_Parts=其他
+    Redstone_Atlas=红石式宇宙神
+    Boosters=助推器
 
 [Part Names]
-    Capsule_Name{0}=太空舱
-    Capsule_Name{1}=太空舱
-    Probe_Name{0}=探测器
-    Probe_Name{1}=探测器
-    Parachute_Name{0}=降落伞
-    Parachute_Name{1}=降落伞
+    Capsule_Name=太空舱
+    Probe_Name=无人探测器
+    Parachute_Name=降落伞
 
-    Kolibri_Engine_Name{0}=蜂鸟发动机
-    Kolibri_Engine_Name{1}=蜂鸟发动机
-    Hawk_Engine_Name{0}=猎鹰发动机
-    Hawk_Engine_Name{1}=猎鹰发动机
-    Valiant_Engine_Name{0}=勇者发动机
-    Valiant_Engine_Name{1}=勇者发动机
-    Titan_Engine_Name{0}=泰坦发动机
-    Titan_Engine_Name{1}=泰坦发动机
-    Frontier_Engine_Name{0}=前沿发动机
-    Frontier_Engine_Name{1}=前沿发动机
-    Peregrine_Engine_Name{0}=游隼发动机
-    Peregrine_Engine_Name{1}=游隼发动机
-    Ion_Engine_Name{0}=离子发动机
-    Ion_Engine_Name{1}=离子发动机
-    RCS_Thruster_Name{0}=RCS推进器
-    RCS_Thruster_Name{1}=RCS推进器
+    Kolibri_Engine_Name=蜂鸟发动机
+    Hawk_Engine_Name=猎鹰发动机
+    Valiant_Engine_Name=勇者发动机
+    Titan_Engine_Name=泰坦发动机
+    Frontier_Engine_Name=前沿发动机
+    Peregrine_Engine_Name=游隼发动机
+    Ion_Engine_Name=离子发动机
+    RCS_Thruster_Name=RCS推进器
 
-    Solid_Rocket_Booster{0}=固体燃料助推器
-    Solid_Rocket_Booster{1}=固体燃料助推器
+    Solid_Rocket_Booster=固体火箭助推器
 
-    Fuel_Tank_Name{0}=燃料箱
-    Fuel_Tank_Name{1}=燃料箱
-    Separator_Name{0}=多级分离器
-    Separator_Name{1}=多级分离器
-    Side_Separator_Name{0}=侧边分离器
-    Side_Separator_Name{1}=侧边分离器
-    Structural_Part_Name{0}=结构部件
-    Structural_Part_Name{1}=结构部件
-    Landing_Leg_Name{0}=着陆腿
-    Landing_Leg_Name{1}=着陆腿
-    Aerodynamic_Nose_Cone_Name{0}=气动鼻锥
-    Aerodynamic_Nose_Cone_Name{1}=气动鼻锥
-    Aerodynamic_Fuselage_Name{0}=气动机身
-    Aerodynamic_Fuselage_Name{1}=气动机身
-    Fairing_Name{0}=整流罩
-    Fairing_Name{1}=整流罩
-    Rover_Wheel_Name{0}=漫游轮
-    Rover_Wheel_Name{1}=漫游轮
-    Docking_Port_Name{0}=对接口
-    Docking_Port_Name{1}=对接口
-    Solar_Panel_Name{0}=太阳能电池板
-    Solar_Panel_Name{1}=太阳能电池板
-    Battery_Name{0}=电池
-    Battery_Name{1}=电池
-    RTG_Name{0}=RTG
-    RTG_Name{1}=RTG
-    Heat_Shield_Name{0}=隔热罩
-    Heat_Shield_Name{1}=隔热罩
-    Fuel_Pipe_Name{0}=燃料管道
-    Fuel_Pipe_Name{1}=燃料管道
+    Fuel_Tank_Name=燃料箱
+    Separator_Name=多级分离器
+    Side_Separator_Name=侧边分离器
+    Structural_Part_Name=结构部件
+    Landing_Leg_Name=着陆腿
+    Aerodynamic_Nose_Cone_Name=气动鼻锥
+    Aerodynamic_Fuselage_Name=气动机身
+    Fairing_Name=整流罩
+    Rover_Wheel_Name=探测车车轮
+    Docking_Port_Name=对接口
+    Solar_Panel_Name=太阳能电池板
+    Battery_Name=电池
+    RTG_Name=RTG
+    Heat_Shield_Name=隔热罩
+    Fuel_Pipe_Name=燃料管道
+    A_7_Engine_Name=A-7 发动机
+    Side_Cover_Name=侧边盖板
+    Cover_name=盖板
+    Fuselage_Name=机身
+    LR_89_5_Engine_Name=LR-89-5 发动机
+    LR_105_5_Engine_Name=LR-105-5 发动机
+    Adapter_Name=适配器
+    Engine_Base_Name=发动机基座
+    Retro_Pack_Name=反推器
+    LES_Name=逃逸塔
 
 [Part Descriptions]
     Capsule_Description=一个小型太空舱，载有一名宇航员
@@ -644,7 +750,7 @@
     Battery_Description=用于储存电力的电池
     Solar_Panel_Description=太阳能电池板，在展开时发电
     RTG_Description=同位素温差发电机或RTG
-    Rover_Wheel_Description=用于在行星表面行驶的漫游轮
+    Rover_Wheel_Description=用于在行星表面行驶的探测车车轮
     Docking_Port_Description=可用于将两辆航天器连接在一起的对接口
     Heat_Shield_Description=用于再入大气的隔热罩
     Fuel_Pipe_Description=用于输送燃料的管道
@@ -663,9 +769,14 @@
     Engine_On_Label=发动机开启
     Gimbal_On_Label=万向节开启
 
-    Msg_RCS_Module_State=RCS%state{0}%
+    Booster_On=助推器：开
+    Booster_Off=助推器：关
+    Cannot_Ignite_Covered_Booster=无法点燃被遮挡的助推器
+    Booster_Cannot_Be_Off=固体燃料助推器一旦点燃就无法关闭
 
-    Wheel_Module_State=漫游轮%state{0}%
+    Msg_RCS_Module_State=RCS%state%
+
+    Wheel_Module_State=探测车车轮%state{0}%
     Wheel_On_Label=轮子开启
 
     Panel_Expanded=展开
@@ -680,6 +791,7 @@
     Msg_Cannot_Fully_Deploy_Above=无法在%height%以上完全展开降落伞
     Msg_Cannot_Deploy_Parachute_While_Faster=无法在速度快于%velocity%时展开降落伞
     Msg_Cannot_Deploy_Parachute_While_Not_Moving=无法在不移动时展开降落伞
+    Msg_Cannot_Deploy_Parachute_Under_Water=无法在水下展开降落伞
     Msg_Parachute_Half_Deployed=降落伞半展开
     Msg_Parachute_Fully_Deployed=降落伞完全展开
     Msg_Parachute_Cut=降落伞断开
@@ -725,6 +837,7 @@
     Mars{0}=火星
     Phobos{0}=火卫一
     Deimos{0}=火卫二
+    Ceres{0}=谷神星
     Jupiter{0}=木星
     Jupiter{1}=木星
     Jupiter{2}=木星
@@ -733,6 +846,62 @@
     Ganymede{0}=木卫三
     Io{0}=木卫一
     Callisto{0}=木卫四
+    Saturn{0}=土星
+    Saturn{1}=土星
+    Saturn{2}=土星
+    Saturn{3}=土星
+    Pan{0}=土卫十八
+    Pan{1}=土卫十八
+    Pan{2}=土卫十八
+    Pan{3}=土卫十八
+    Enceladus{0}=土卫二
+    Enceladus{1}=土卫二
+    Enceladus{2}=土卫二
+    Enceladus{3}=土卫二
+    Iapetus{0}=土卫八
+    Iapetus{1}=土卫八
+    Iapetus{2}=土卫八
+    Iapetus{3}=土卫八
+    Titan{0}=土卫六
+    Titan{1}=土卫六
+    Titan{2}=土卫六
+    Titan{3}=土卫六
+    Uranus{0}=天王星
+    Uranus{1}=天王星
+    Uranus{2}=天王星
+    Uranus{3}=天王星
+    Miranda{0}=天卫五
+    Miranda{1}=天卫五
+    Miranda{2}=天卫五
+    Miranda{3}=天卫五
+    Ariel{0}=天卫一
+    Ariel{1}=天卫一
+    Ariel{2}=天卫一
+    Ariel{3}=天卫一
+    Titania{0}=天卫三
+    Titania{1}=天卫三
+    Titania{2}=天卫三
+    Titania{3}=天卫三
+    Neptune{0}=海王星
+    Neptune{1}=海王星
+    Neptune{2}=海王星
+    Neptune{3}=海王星
+    Proteus{0}=海卫八
+    Proteus{1}=海卫八
+    Proteus{2}=海卫八
+    Proteus{3}=海卫八
+    Triton{0}=海卫一
+    Triton{1}=海卫一
+    Triton{2}=海卫一
+    Triton{3}=海卫一
+    Pluto{0}=冥王星
+    Pluto{1}=冥王星
+    Pluto{2}=冥王星
+    Pluto{3}=冥王星
+    Charon{0}=卡戎
+    Charon{1}=卡戎
+    Charon{2}=卡戎
+    Charon{3}=卡戎
 
 [Landmarks]
     Sea_of_Tranquility=静海
@@ -749,12 +918,54 @@
     Utopia_Planitia=乌托邦平原
     Jezero_Crater=耶泽罗陨击坑
 
+    Stickney_Crater=斯蒂克尼陨石坑
+
+    Voltaire_Crater=伏尔泰陨石坑
+    Swift_Crater=斯威夫特陨石坑
+
     Atalanta_Planitia=爱塔兰塔平原
     Lavinia_Planitia=拉卫尼亚平原
 
     Caloris_Planitia=卡洛里平原
     Borealis_Planitia=北极平原
     Maxwell_Montes=麦克斯韦山脉
+
+    Laica_Crater=拉伊卡陨石坑
+    Kachina_Chasmata=卡琴娜深谷
+
+    Urvara_Crater=乌尔瓦拉陨石坑
+    Kerwan_Crater=克尔旺陨石坑
+
+    Bosphorus_Regio=博斯普鲁斯区
+    Colchis_Regio=科尔客斯区
+    Chalybes_Regio=查力比斯区
+
+    Conamara_Chaos=康纳马拉混沌
+
+    Galileo_Regio=伽利略区
+
+    Equatorial_Ridge=赤道脊
+
+    Verona_Rupes=维罗纳断崖
+    Arden_Corona=阿尔丁冕状物
+    Elsinore_Corona=爱尔西诺冕状物
+
+    Tiger_Stripes=虎皮条纹
+
+    Senkyo_Ocean=仙境洋
+    Fensal_Ocean=芬撒里尔洋
+    Shangri_La_Ocean=香格里拉洋
+
+    Bona_Chasma=博纳峡谷
+
+    Pharos_Crater=法罗斯陨石坑
+
+    Guttae=古泰
+
+    Sputnik_Planitia=斯普特尼克平原
+
+    Serenity_Chasma=宁静峡谷
+    Mordor_Macula=魔多黄斑
 
 [Challenges]
     Liftoff_Title=升空
@@ -799,44 +1010,39 @@
     MercuryReturn_Title=水星返回
     MercuryReturn=着陆在水星表面，然后安全返回
 
-
-    LandAndReturn_Title=%planet{0}%着陆
-    LandAndReturn=着陆在%planet{0}%表面，然后安全返回
-
 [Achievements]
-    Reached_Height=达到%height%海拔高度
     Reached_Karman_Line=穿过卡门线，离开大气层，进入太空
-    Survived_Reentry=进入%planet{3}%大气，最高温度%temperature%
+    Reached_Height=达到%height%海拔高度
 
-    Reached_Low_Orbit=到达%planet{0}%低轨道
-    Reached_High_Orbit=到达%planet{0}%高轨道
-    Descend_Low_Orbit=下降至%planet{0}%低轨道
-    Capture_Low_Orbit=被捕获至%planet{0}%低轨道
-    Capture_High_Orbit=捕获至%planet{0}%高轨道
+[Mod Loader]
+    Mods_Button=Mods
+    Mods_Still_Loading=Mods 仍在加载中...
+    ModType_Label=类型：%type%
+    Version_Label=版本：%version%
+    CodeMod_Name=代码 Mod
+    PartAssetPack_Name=部件资源包
+    TexturePack_Name=纹理资源包
+    SolarSystemPack_Name=星系包
+    CodeModNotAllowedOnMobile=不支持：由于移动设备对自定义代码执行的限制，因此不支持带有自定义代码的 Mod
+    Author_Label=作者：%name%
+    Changes_Warning=你要现在重启游戏，以使 Mod 更改生效吗？
+    Relaunch=重启
 
-    Entered_Lower_Atmosphere=进入%planet{3}%低层大气
-    Entered_Upper_Atmosphere=进入%planet{3}%高层大气
-    Left_Lower_Atmosphere=到达%planet{3}%高层大气
-    Left_Upper_Atmosphere=脱离%planet{3}%大气
+    Set_ModsFolder_Question=选择 Mods 文件夹将同时把游戏保存数据移动到该文件夹中。
+    Set_ModsFolder_Question=您的数据将自动复制到该文件夹中。
 
-    Landed=着陆在%planet{1}%表面
+    Lost_Access_Mods=对存储文件夹的访问权限已丢失。
+    Lost_Access_Mods=重新使用同一文件夹以访问保存内容
+    Lost_Access_Mods=旧文件夹位于：%path%
 
-    Landed_At_Landmark=着陆在%planet{1}%表面
-    Landed_At_Landmark=<size=55>地标：%landmark%</size>
+    Set_ModsFolder_Continue=继续
 
-    Landed_At_Landmark__Short=着陆在%planet{1}%表面
-    Landed_At_Landmark__Short=- %landmark% -
+    Set_ModsFolder_Confirm_Copy=是否将保存内容从：
+    Set_ModsFolder_Confirm_Copy=%oldPath%
+    Set_ModsFolder_Confirm_Copy=复制至：
+    Set_ModsFolder_Confirm_Copy=%newPath%
+    Set_ModsFolder_Confirm_Copy=这将覆盖新位置中的保存数据，且可能造成不可逆的损失！
 
-    Crashed_Into_Terrain=坠毁在%planet{1}%表面
-
-    Entered_SOI=进入%planet{1}%引力范围
-    Escaped_SOI=脱离%planet{1}%引力范围
-
-    Docked_Suborbital=在%planet{1}%亚轨道对接
-    Docked_Orbit_Low=在%planet{1}%低轨道对接
-    Docked_Orbit_Transfer=在%planet{1}%转移轨道对接
-    Docked_Orbit_High=在%planet{1}%高轨道对接
-    Docked_Escape=在%planet{1}%逃逸轨道对接
-    Docked_Surface=在%planet{1}%地表对接
-
-    Recover_Home=安全返回%planet{1}%
+[Notifications]
+    Notify_For_New_Releases=想要在新版本发布时收到通知吗？
+    Notify_Me=通知我！

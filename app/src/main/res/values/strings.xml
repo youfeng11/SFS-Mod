@@ -7,6 +7,7 @@
     <string name="warning">仅供个人学习研究使用，请在下载后24小时内删除！</string>
     <string name="osl">开放源代码许可</string>
     <string name="close">关闭</string>
+    <string name="ok">确定</string>
 
     <string name="not_supported_info">仅支持在中国大陆地区使用，你所在的地区（%s）不支持！</string>
 

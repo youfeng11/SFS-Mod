@@ -1,3 +1,5 @@
+import com.mikepenz.aboutlibraries.plugin.DuplicateMode
+import com.mikepenz.aboutlibraries.plugin.DuplicateRule
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -11,6 +13,7 @@ plugins {
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.aboutlibraries)
+    alias(libs.plugins.aboutlibraries.android)
 }
 
 val keystoreDir = "$rootDir/keystore"
@@ -105,15 +108,12 @@ android {
     }
 
     aboutLibraries {
-        android {
-            registerAndroidTasks = true
-        }
         collect {
             configPath = file("aboutlibs_config")
         }
         library {
-            duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
-            duplicationRule = com.mikepenz.aboutlibraries.plugin.DuplicateRule.SIMPLE
+            duplicationMode = DuplicateMode.MERGE
+            duplicationRule = DuplicateRule.SIMPLE
         }
     }
 }

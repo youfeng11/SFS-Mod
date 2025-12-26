@@ -32,34 +32,30 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youfeng.sfsmod.BuildConfig
 import com.youfeng.sfsmod.R
-import com.youfeng.sfsmod.domain.state.VerifySignatureState
 import com.youfeng.sfsmod.ui.component.HighlightClickableText
 import com.youfeng.sfsmod.ui.component.OverflowMenu
 import com.youfeng.sfsmod.ui.event.UiEvent
+import com.youfeng.sfsmod.ui.state.AppState
+import com.youfeng.sfsmod.ui.state.UiState
+import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 import com.youfeng.sfsmod.util.DeviceInfo
 import com.youfeng.sfsmod.util.installApk
 import com.youfeng.sfsmod.util.vibrate
-import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
-import com.youfeng.sfsmod.ui.state.AppState
-import com.youfeng.sfsmod.ui.state.UiState
 
 /**
  * 主界面入口，实现：
@@ -292,7 +288,11 @@ private fun LoadingSection(uiState: UiState, deviceInfo: String = DeviceInfo.Dev
                         }
                     )
 
-                    is AppState.Error -> stringResource(R.string.error_info, appState.errorText.asString(), deviceInfo)
+                    is AppState.Error -> stringResource(
+                        R.string.error_info,
+                        appState.errorText.asString(),
+                        deviceInfo
+                    )
 
                     is AppState.Loading -> stringResource(R.string.loading)
                 },

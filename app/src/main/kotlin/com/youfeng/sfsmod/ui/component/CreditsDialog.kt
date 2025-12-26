@@ -5,23 +5,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.mikepenz.aboutlibraries.ui.compose.DefaultChipColors
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
-import com.mikepenz.aboutlibraries.ui.compose.android.rememberLibraries
+import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.m3.libraryColors
 import com.youfeng.sfsmod.R
@@ -39,17 +38,15 @@ fun CreditsDialog(onDismissRequest: () -> Unit) {
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false),
         modifier = Modifier.widthIn(max = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() - 60.dp }),
-        title = { Text(stringResource(R.string.osl)) }, // R.string.osl对应"开源许可"
+        title = { Text(stringResource(R.string.osl)) },
         text = {
+            val libraries by produceLibraries(R.raw.aboutlibraries)
             LibrariesContainer(
-                libraries = rememberLibraries().value,
+                libraries = libraries,
                 modifier = Modifier.fillMaxSize(), // 全屏高度显示库列表
                 colors = LibraryDefaults.libraryColors(
-                    backgroundColor = AlertDialogDefaults.containerColor,
-                    licenseChipColors = DefaultChipColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
-                    )
+                    libraryBackgroundColor = Color.Transparent,
+                    dialogBackgroundColor = MaterialTheme.colorScheme.background
                 ),
                 divider = {
                     HorizontalDivider(
@@ -59,7 +56,8 @@ fun CreditsDialog(onDismissRequest: () -> Unit) {
                                 horizontal = 8.dp
                             )
                     )
-                }
+                },
+                licenseDialogConfirmText = stringResource(R.string.ok)
             )
         },
         confirmButton = {

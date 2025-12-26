@@ -1,7 +1,7 @@
 package com.youfeng.sfsmod.data.repository
 
-import android.os.Build
 import android.content.Context
+import android.os.Build
 import com.youfeng.sfsmod.util.copyAssetFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +33,7 @@ class MainRepositoryImpl @Inject constructor(
         val dataPath = context.filesDir.toOkioPath().parent!!.resolve("shared_prefs")
         val languagePath = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.BAKLAVA) {
             @Suppress("DEPRECATION")
-            context.getExternalMediaDirs()!!.first().toOkioPath().resolve("Custom Translations")
+            context.externalMediaDirs!!.first().toOkioPath().resolve("Custom Translations")
         } else {
             context.getExternalFilesDir("Custom Translations")!!.toOkioPath()
         }

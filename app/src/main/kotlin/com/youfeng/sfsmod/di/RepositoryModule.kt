@@ -8,7 +8,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
 /**
  * Hilt 模块，用于提供仓库层的依赖关系

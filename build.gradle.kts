@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.aboutlibraries) apply false
+    alias(libs.plugins.aboutlibraries.android) apply false
     alias(libs.plugins.hilt.gradle) apply false
     alias(libs.plugins.ksp) apply false
 }

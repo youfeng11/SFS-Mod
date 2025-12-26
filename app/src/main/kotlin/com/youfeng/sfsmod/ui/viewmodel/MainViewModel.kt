@@ -127,15 +127,11 @@ class MainViewModel @Inject constructor(
         _uiState.update { it.copy(showInstallPermissionDialog = false) }
         menuStopOnClick()
     }
-    
-    fun onConfirmInstallPermissionDialog() {
-        requestInstallPermission()
-    }
 
     /**
      * 当用户在对话框点击 "去授权" 时，由View层调用此方法
      */
-    fun requestInstallPermission() {
+    fun onConfirmInstallPermissionDialog() {
         _uiEvent.trySend(UiEvent.RequestInstallPermission)
     }
 
@@ -187,7 +183,16 @@ class MainViewModel @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            _uiState.update { it.copy(appState = AppState.Error(UiText.StringResource(R.string.error_unknown, e.message))) }
+            _uiState.update {
+                it.copy(
+                    appState = AppState.Error(
+                        UiText.StringResource(
+                            R.string.error_unknown,
+                            e.message ?: e
+                        )
+                    )
+                )
+            }
         }
     }
 

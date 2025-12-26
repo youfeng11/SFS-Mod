@@ -1,7 +1,6 @@
 package com.youfeng.sfsmod.ui.state
 
 import com.youfeng.sfsmod.R
-import com.youfeng.sfsmod.domain.state.VerifySignatureState
 import com.youfeng.sfsmod.util.UiText
 
 data class UiState(
@@ -23,5 +22,6 @@ sealed class AppState {
     data class Done(val timer: Int) : AppState()
 
     /** 错误状态（携带具体错误类型） */
-    data class Error(val errorText: UiText = UiText.StringResource(R.string.error_unknown, "")) : AppState()
+    data class Error(val errorText: UiText = UiText.StringResource(R.string.error_unknown, "")) :
+        AppState()
 }
