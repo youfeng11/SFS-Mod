@@ -188,7 +188,9 @@ class MainViewModel @Inject constructor(
                     appState = AppState.Error(
                         UiText.StringResource(
                             R.string.error_unknown,
-                            e.message ?: e
+                            if (e is NullPointerException)
+                                UiText.StringResource(R.string.error_null_pointer_exception)
+                            else e.message ?: e
                         )
                     )
                 )
