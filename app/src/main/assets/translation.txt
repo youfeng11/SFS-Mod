@@ -22,7 +22,7 @@
 
 # 在Gitee查看：https://gitee.com/YouFeng11/SFS-zh-CN-Translation
 
-# 版本：2025.12.26
+# 版本：2025.12.28
 # 警告⚠️：
 #   该汉化是基于 MIT License 发布的开源作品，版权所有！
 #   除非你知道你应该怎么做，否则请不要将本作品在修改后传播！
@@ -1016,7 +1016,7 @@
 
 [Mod Loader]
     Mods_Button=Mods
-    Mods_Still_Loading=Mods 仍在加载中...
+    Mods_Still_Loading=Mods 还在加载中...
     ModType_Label=类型：%type%
     Version_Label=版本：%version%
     CodeMod_Name=代码 Mod
