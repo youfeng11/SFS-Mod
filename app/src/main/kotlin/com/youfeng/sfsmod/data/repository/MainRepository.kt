@@ -30,29 +30,35 @@ class MainRepositoryImpl @Inject constructor(
      * @return APK 临时文件路径
      */
     override suspend fun copyResources(): Path {
-        val dataPath = context.filesDir.toOkioPath().parent!!.resolve("shared_prefs")
-        val languagePath = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.BAKLAVA) {
+        val sharedPrefsPath = context.filesDir.toOkioPath().parent!!.resolve("shared_prefs")
+        val dataPath = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.BAKLAVA) {
             @Suppress("DEPRECATION")
-            context.externalMediaDirs!!.first().toOkioPath().resolve("Custom Translations")
+            context.externalMediaDirs.first()
         } else {
-            context.getExternalFilesDir("Custom Translations")!!.toOkioPath()
-        }
+            context.getExternalFilesDir(null)
+        }!!.toOkioPath()
+        val languagePath = dataPath.resolve("Custom Translations")
+        val settingsPath = dataPath.resolve("Saving/Settings")
         val externalCachePath = context.externalCacheDir!!.toOkioPath()
 
         return withContext(Dispatchers.IO) {
             // 创建目录
-            listOf(dataPath, languagePath, externalCachePath).forEach {
+            listOf(sharedPrefsPath, languagePath, settingsPath, externalCachePath).forEach {
                 fileSystem.createDirectories(it)
             }
 
             // 复制资源文件
             context.copyAssetFile(
                 "mod.xml",
-                dataPath.resolve("com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml")
+                sharedPrefsPath.resolve("com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml")
             )
             context.copyAssetFile(
                 "translation.txt",
                 languagePath.resolve("简体中文.txt")
+            )
+            context.copyAssetFile(
+                "LanguageSettings_2.txt",
+                settingsPath.resolve("LanguageSettings_2.txt")
             )
 
             val apkPath = externalCachePath.resolve("temp.apk")
@@ -61,5 +67,4 @@ class MainRepositoryImpl @Inject constructor(
             apkPath
         }
     }
-
 }
