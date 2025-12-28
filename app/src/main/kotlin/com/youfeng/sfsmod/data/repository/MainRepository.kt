@@ -30,41 +30,40 @@ class MainRepositoryImpl @Inject constructor(
      * @return APK 临时文件路径
      */
     override suspend fun copyResources(): Path {
-        val sharedPrefsPath = context.filesDir.toOkioPath().parent!!.resolve("shared_prefs")
+        val sharedPrefsPath = context.filesDir.toOkioPath().parent!! / "shared_prefs" / "com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml"
         val dataPath = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.BAKLAVA) {
             @Suppress("DEPRECATION")
             context.externalMediaDirs.first()
         } else {
             context.getExternalFilesDir(null)
         }!!.toOkioPath()
-        val languagePath = dataPath.resolve("Custom Translations")
-        val settingsPath = dataPath.resolve("Saving/Settings")
-        val externalCachePath = context.externalCacheDir!!.toOkioPath()
+        val languagePath = dataPath / "Custom Translations" / "简体中文.txt"
+        val settingsPath = dataPath / "Saving" / "Settings" / "LanguageSettings_2.txt"
+        val apkCachePath = context.externalCacheDir!!.toOkioPath() / "temp.apk"
 
         return withContext(Dispatchers.IO) {
             // 创建目录
-            listOf(sharedPrefsPath, languagePath, settingsPath, externalCachePath).forEach {
-                fileSystem.createDirectories(it)
+            listOf(sharedPrefsPath, languagePath, settingsPath, apkCachePath).forEach {
+                fileSystem.createDirectories(it.parent!!)
             }
 
             // 复制资源文件
             context.copyAssetFile(
                 "mod.xml",
-                sharedPrefsPath.resolve("com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml")
+                sharedPrefsPath
             )
             context.copyAssetFile(
                 "translation.txt",
-                languagePath.resolve("简体中文.txt")
+                languagePath
             )
             context.copyAssetFile(
                 "LanguageSettings_2.txt",
-                settingsPath.resolve("LanguageSettings_2.txt")
+                settingsPath
             )
 
-            val apkPath = externalCachePath.resolve("temp.apk")
-            context.copyAssetFile("base.apk.1", apkPath)
+            context.copyAssetFile("base.apk.1", apkCachePath)
 
-            apkPath
+            apkCachePath
         }
     }
 }
