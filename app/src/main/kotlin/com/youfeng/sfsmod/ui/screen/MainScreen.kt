@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -54,6 +55,7 @@ import com.youfeng.sfsmod.ui.state.AppState
 import com.youfeng.sfsmod.ui.state.UiState
 import com.youfeng.sfsmod.ui.viewmodel.MainViewModel
 import com.youfeng.sfsmod.util.DeviceInfo
+import com.youfeng.sfsmod.util.UiText
 import com.youfeng.sfsmod.util.installApk
 import com.youfeng.sfsmod.util.vibrate
 
@@ -340,28 +342,34 @@ private fun LoadingIcon(uiState: AppState) {
 
 
 // UI预览
-/*
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutLoadingPreview() {
-    MainLayout(uiState = AppState.Loading)
+    MainLayout(uiState = UiState())
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutStoppedPreview() {
-    MainLayout(uiState = AppState.Stopped)
+    MainLayout(
+        uiState = UiState(appState = AppState.Stopped)
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutDonePreview() {
-    MainLayout(uiState = AppState.Done(3))
+    MainLayout(
+        uiState = UiState(appState = AppState.Done(3))
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainLayoutErrorSignatureMismatchPreview() {
-    MainLayout(uiState = AppState.Error(VerifySignatureState.SignatureMismatch))
+    MainLayout(
+        uiState = UiState(
+            appState = AppState.Error(UiText.DynamicString("Test"))
+        )
+    )
 }
-*/
