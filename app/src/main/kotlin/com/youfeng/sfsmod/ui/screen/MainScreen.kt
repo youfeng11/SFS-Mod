@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
@@ -149,6 +151,7 @@ fun InstallPermissionDialog(
         text = {
             HighlightClickableText(
                 text = stringResource(R.string.permission_dialog_message),
+                modifier = Modifier.verticalScroll(rememberScrollState()),
                 onClickHighlight = onSkip
             )
         },
