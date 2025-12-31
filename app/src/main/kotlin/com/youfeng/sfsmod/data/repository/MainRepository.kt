@@ -30,7 +30,8 @@ class MainRepositoryImpl @Inject constructor(
      * @return APK 临时文件路径
      */
     override suspend fun copyResources(): Path {
-        val sharedPrefsPath = context.filesDir.toOkioPath().parent!! / "shared_prefs" / "com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml"
+        val sharedPrefsPath =
+            context.filesDir.toOkioPath().parent!! / "shared_prefs" / "com.StefMorojna.SpaceflightSimulator.v2.playerprefs.xml"
         val dataPath = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.BAKLAVA) {
             @Suppress("DEPRECATION")
             context.externalMediaDirs.first()

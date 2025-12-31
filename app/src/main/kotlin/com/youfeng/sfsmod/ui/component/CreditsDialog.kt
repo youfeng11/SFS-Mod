@@ -34,7 +34,9 @@ fun CreditsDialog(onDismissRequest: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 36.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 36.dp),
         title = { Text(stringResource(R.string.osl)) },
         text = {
             val libraries by produceLibraries(R.raw.aboutlibraries)
