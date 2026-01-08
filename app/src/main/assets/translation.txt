@@ -22,7 +22,7 @@
 
 # 在Gitee查看：https://gitee.com/YouFeng11/SFS-zh-CN-Translation
 
-# 版本：2025.12.28
+# 版本：2026.01.08
 # 警告⚠️：
 #   该汉化是基于 MIT License 发布的开源作品，版权所有！
 #   除非你知道你应该怎么做，否则请不要将本作品在修改后传播！
@@ -866,6 +866,18 @@
     Titan{1}=土卫六
     Titan{2}=土卫六
     Titan{3}=土卫六
+    Rhea{0}=土卫五
+    Rhea{1}=土卫五
+    Rhea{2}=土卫五
+    Rhea{3}=土卫五
+    Tethys{0}=土卫三
+    Tethys{1}=土卫三
+    Tethys{2}=土卫三
+    Tethys{3}=土卫三
+    Dione{0}=土卫四
+    Dione{1}=土卫四
+    Dione{2}=土卫四
+    Dione{3}=土卫四
     Uranus{0}=天王星
     Uranus{1}=天王星
     Uranus{2}=天王星
@@ -882,6 +894,14 @@
     Titania{1}=天卫三
     Titania{2}=天卫三
     Titania{3}=天卫三
+    Umbriel{0}=天卫二
+    Umbriel{1}=天卫二
+    Umbriel{2}=天卫二
+    Umbriel{3}=天卫二
+    Oberon{0}=天卫四
+    Oberon{1}=天卫四
+    Oberon{2}=天卫四
+    Oberon{3}=天卫四
     Neptune{0}=海王星
     Neptune{1}=海王星
     Neptune{2}=海王星
@@ -949,6 +969,8 @@
     Verona_Rupes=维罗纳断崖
     Arden_Corona=阿尔丁冕状物
     Elsinore_Corona=爱尔西诺冕状物
+
+    Mommur_Chasma=莫姆尔峡谷
 
     Tiger_Stripes=虎皮条纹
 
