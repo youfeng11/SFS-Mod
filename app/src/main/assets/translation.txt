@@ -22,7 +22,7 @@
 
 # 在Gitee查看：https://gitee.com/YouFeng11/SFS-zh-CN-Translation
 
-# 版本：2026.01.08
+# 版本：2026.01.09
 # 警告⚠️：
 #   该汉化是基于 MIT License 发布的开源作品，版权所有！
 #   除非你知道你应该怎么做，否则请不要将本作品在修改后传播！
@@ -304,6 +304,21 @@
 
 # Full bundle
     FullBundle_Description=以折扣价获取所有拓展包！
+
+    GoogleSignIn=登录
+    GoogleSignOut=退出登录
+    SignInForPurchaseRecovery=登录以获取购买记录
+    CurrentGoogleAcc=账号：%email%
+    RecoveredPurchases=已恢复的购买：
+    PurchaseAddId=添加ID
+    PurchaseAlreadyRegistered=该购买记录ID已被注册。
+    OrderNotFound=未找到购买记录，请确保ID正确。
+
+    OrderNotProcessed=该次购买未被正确处理。
+    OrderNotProcessed=该次购买可能已被退款。
+
+    PurchaseNotConsumed=该次购买应处于正常状态，无法申请。
+    PurchaseNotConsumed=请尝试使用常规恢复选项。
 
 [Sharing]
     Share_Button=分享蓝图
