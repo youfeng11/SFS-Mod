@@ -22,7 +22,7 @@
 
 # 在Gitee查看：https://gitee.com/YouFeng11/SFS-zh-CN-Translation
 
-# 版本：2026.01.09
+# 版本：2026.01.10
 # 警告⚠️：
 #   该汉化是基于 MIT License 发布的开源作品，版权所有！
 #   除非你知道你应该怎么做，否则请不要将本作品在修改后传播！
@@ -986,6 +986,9 @@
     Elsinore_Corona=爱尔西诺冕状物
 
     Mommur_Chasma=莫姆尔峡谷
+
+    Telemachus=忒勒玛科斯撞击坑
+    Ithaca_Chasma=伊萨卡峡谷
 
     Tiger_Stripes=虎皮条纹
 
