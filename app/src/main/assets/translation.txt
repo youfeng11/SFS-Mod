@@ -22,7 +22,7 @@
 
 # 在Gitee查看：https://gitee.com/YouFeng11/SFS-zh-CN-Translation
 
-# 版本：2026.01.12
+# 版本：2026.01.14
 # 警告⚠️：
 #   该汉化是基于 MIT License 发布的开源作品，版权所有！
 #   除非你知道你应该怎么做，否则请不要将本作品在修改后传播！
@@ -89,6 +89,9 @@
     Credits_Text=<Size=55> 程序 </size>
     Credits_Text=
     Credits_Text=<Size=70> Andrey Onischenko </size>
+    Credits_Text=<Size=55> 程序 </size>
+    Credits_Text=
+    Credits_Text=<Size=70> Aris Semertzidis </size>
     Credits_Text=<Size=55> 程序 </size>
     Credits_Text=
     Credits_Text=<Size=70> Davi Vasc </size>
