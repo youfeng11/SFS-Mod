@@ -33,8 +33,8 @@ android {
         applicationId = "com.StefMorojna.SpaceflightSimulator"
         minSdk = 23
         targetSdk = 36
-        versionCode = 727
-        versionName = "1.6.00.6-3.2.0"
+        versionCode = 739
+        versionName = "1.6.00.7-3.2.0"
 
         ndk {
             //noinspection ChromeOsAbiSupport
