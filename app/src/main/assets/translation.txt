@@ -1,35 +1,4 @@
-# MIT License
-# 
-# Copyright (c) 2023 由风
-# 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-# 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-# 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
-# 在Gitee查看：https://gitee.com/YouFeng11/SFS-zh-CN-Translation
-
-# 版本：2026.01.14
-# 警告⚠️：
-#   该汉化是基于 MIT License 发布的开源作品，版权所有！
-#   除非你知道你应该怎么做，否则请不要将本作品在修改后传播！
-#   如果你想在修改后传播，请详细阅读并充分理解MIT协议！这已经很自由了！
-
-# 你已经被警告过了！！！
-
+# 在Gitee查看：https://gitee.com/SFS-Chinese/SFS-zh-CN-Translation
 [None]
     None=None
     Font=normal
@@ -46,7 +15,7 @@
     Help=帮助
 
     Build_Rocket=建造火箭
-    Resume_Game=回到游戏
+    Resume_Game=继续游戏
     Return_To_Main_Menu=主菜单
     Exit_To_Main_Menu=返回主菜单
 
@@ -61,9 +30,9 @@
     Development_Preview=开发预览
     Development_Preview_Explanation=开发预览展示了我们正在开发的未来更新
 
-    Mod_Loader_OpenButton=Mod 加载器
-    Download_Mods=下载 Mods
-    Open_Mods_Folder=打开 Mods 文件夹
+    Mod_Loader_OpenButton=模组加载器
+    Download_Mods=下载模组
+    Open_Mods_Folder=打开模组文件夹
 
     Community_OpenButton=社区
     Community_Youtube=Youtube
@@ -99,6 +68,10 @@
     Credits_Text=
     Credits_Text=<Size=70> Ashton Mills </size>
     Credits_Text=<size=55> 作曲 </size>
+    Credits_Text=
+    Credits_Text=<Size=55> 简体中文翻译： </size>
+    Credits_Text=<size=65> 由风 </size>
+    Credits_Text=<size=60> 重铬酸钠、A Future star </size>
 
     First_Time_Playing_Question=首次游玩
     First_Time_Playing_Question=Spaceflight Simulator?
@@ -151,8 +124,8 @@
     Allow_Cheats_Name=允许作弊：%value%
     Allow_Cheats_Label=允许作弊
 
-    Allow_Quicksaves_Name=允许快速存档：%value%
-    Allow_Quicksaves_Label=允许快速存档
+    Allow_Quicksaves_Name=允许存档：%value%
+    Allow_Quicksaves_Label=允许存档
 
     World_Difficulty_Name=难度：%value%
     Difficulty_Easy=简单
@@ -160,7 +133,7 @@
     Difficulty_Hard=困难
     Difficulty_Medium=中等
     Difficulty_Extreme=极端
-    Difficulty_Realistic=现实
+    Difficulty_Realistic=真实
 
     World_SolarSystem_Name=星系：%value%
 
@@ -195,10 +168,10 @@
     Cannot_Save_Empty_Build=无法保存空蓝图
 
 # Quicksave stuff
-    Quicksaves_Menu_Title=快速存档
-    Unnamed_Quicksave=未命名快速存档
-    Create_Quicksave=创建快速存档
-    Load_Quicksave=加载快速存档
+    Quicksaves_Menu_Title=存档
+    Unnamed_Quicksave=未命名存档
+    Create_Quicksave=创建存档
+    Load_Quicksave=加载存档
 
 # Save and load menus
     Save=保存
@@ -216,12 +189,12 @@
 
 # filetype (injected)
     Blueprint=蓝图
-    Quicksave=快速存档
+    Quicksave=存档
 
 # Ask overwrite menu
     File_Already_Exists=已存在此名称的%filetype%
     Overwrite_File=覆盖%filetype%
-    New_File=新的%filetype%
+    New_File=重命名%filetype%
 
 # Load failure
     Load_Failed=无法从%filepath%加载%filetype%
@@ -233,7 +206,7 @@
     Bundles_List_Title=捆绑包
     Parts_Expansion=部件拓展包
     Expand_View_Button=展开视图
-    Redstone_Atlas_Pack=红石式宇宙神包
+    Redstone_Atlas_Pack=红石-宇宙神包
     Skins_Expansion=皮肤拓展包
     Gas_Giants_Expansion=气态巨行星拓展包
     Ice_Giants_Expansion=冰态巨行星拓展包
@@ -323,6 +296,9 @@
     PurchaseNotConsumed=该次购买应处于正常状态，无法申请。
     PurchaseNotConsumed=请尝试使用常规恢复选项。
 
+    RestoredSuccessfully=该次购买应处于正常状态，无法申请。
+    RestoredSuccessfully=尝试使用常规恢复选项。
+
 [Sharing]
     Share_Button=分享蓝图
     Upload_Blueprint_PC=上传蓝图
@@ -333,7 +309,7 @@
     Empty_Upload=无法上传空蓝图
     Uploading_Message=上传中...
     Upload_Fail=蓝图上传失败
-    Copied_URL_To_Clipboard=复制蓝图URL至剪贴板
+    Copied_URL_To_Clipboard=蓝图URL已复制至剪贴板
     Sharing_Enter_Prompt=选择要将蓝图加载到的世界
     Must_Create_World_Download_BP=你必须创建一个世界才能下载蓝图
     Confirm_Download_Button=下载蓝图
@@ -370,7 +346,7 @@
     No_Heat_Damage_Name=无热损伤
     No_Burn_Marks_Name=无燃烧痕迹
     Refill_Fuel_Tanks=加注燃料箱
-    Refilled_Tanks=加注全部燃料箱
+    Refilled_Tanks=已加注所有燃料箱
     Unlock_Cheats_Button=解锁作弊
 
     Unlock_Cheats_Warning=启用作弊功能会将你的挑战世界转变为沙盒世界。
@@ -563,13 +539,13 @@
     Failure_Crash_Into_Terrain=在%planet{1}%表面坠毁
     LandAndReturn_Title=%planet{0}%着陆
     LandAndReturn=着陆在%planet{0}%表面，然后安全返回
-    Survived_Reentry=Reentered %planet{3}% atmosphere, max temperature %temperature%
+    Survived_Reentry=进入%planet{3}%大气，最高温度%temperature%
 
     Reached_Low_Orbit=到达%planet{0}%低轨道
     Reached_High_Orbit=到达%planet{0}%高轨道
     Descend_Low_Orbit=下降至%planet{0}%低轨道
     Capture_Low_Orbit=被捕获至%planet{0}%低轨道
-    Capture_High_Orbit=捕获至%planet{0}%高轨道
+    Capture_High_Orbit=被捕获至%planet{0}%高轨道
 
     Entered_Lower_Atmosphere=进入%planet{3}%低层大气
     Entered_Upper_Atmosphere=进入%planet{3}%高层大气
@@ -590,9 +566,9 @@
     Escaped_SOI=脱离%planet{1}%引力范围
 
     Docked_Suborbital=在%planet{1}%亚轨道对接
-    Docked_Orbit_Low=在%planet{1}%低轨道对接
+    Docked_Orbit_Low=在%planet{0}%低轨道对接
     Docked_Orbit_Transfer=在%planet{1}%转移轨道对接
-    Docked_Orbit_High=在%planet{1}%高轨道对接
+    Docked_Orbit_High=在%planet{0}%高轨道对接
     Docked_Escape=在%planet{1}%逃逸轨道对接
     Docked_Surface=在%planet{1}%地表对接
 
@@ -660,15 +636,15 @@
 
 [Units]
     Thrust_To_Weight_Ratio=推力/重量：%value%
-    Mass=质量：%value%吨
+    Mass=质量：%value%t
     Density=密度：%value%
-    Thrust=推力：%value%吨
-    Burn_Time=燃烧时间：%value%秒
-    Efficiency=效率：%value%比冲
-    Mass_Unit=吨
-    Meter_Unit=米
-    Km_Unit=千米
-    Meter_Per_Second_Unit=米/秒
+    Thrust=推力：%value%t
+    Burn_Time=燃烧时间：%value%s
+    Efficiency=效率：%value% Isp
+    Mass_Unit=t
+    Meter_Unit=m
+    Km_Unit=km
+    Meter_Per_Second_Unit=m/s
 
 [Timestamps]
     Second_Short=%value%秒
@@ -697,7 +673,7 @@
     Fairings_Parts=整流罩
     Structural_Parts=结构
     Other_Parts=其他
-    Redstone_Atlas=红石式宇宙神
+    Redstone_Atlas=红石 - 宇宙神
     Boosters=助推器
 
 [Part Names]
@@ -724,7 +700,7 @@
     Aerodynamic_Nose_Cone_Name=气动鼻锥
     Aerodynamic_Fuselage_Name=气动机身
     Fairing_Name=整流罩
-    Rover_Wheel_Name=探测车车轮
+    Rover_Wheel_Name=漫游轮
     Docking_Port_Name=对接口
     Solar_Panel_Name=太阳能电池板
     Battery_Name=电池
@@ -753,8 +729,8 @@
     Structural_Part_Description=轻巧而坚固的结构部件
     Hawk_Engine_Description=高推力 - 低效率发动机，通常用于火箭的第一级
     Titan_Engine_Description=高推力 - 低效率发动机，通常用于火箭的第一级
-    Valiant_Engine_Description=高效率，低推力。当大推力不是优先考虑的情况时用于太空
-    Frontier_Engine_Description=高效率，低推力。当大推力不是优先考虑的情况时用于太空
+    Valiant_Engine_Description=高效率，低推力。用于不优先考虑高推力的太空
+    Frontier_Engine_Description=高效率，低推力。用于不优先考虑高推力的太空
     Kolibri_Engine_Description=用于着陆器的微型发动机
     Ion_Engine_Description=效率高得令人难以置信的低推力发动机
     RCS_Thruster_Description=一组用于对接的小型定向推进器
@@ -767,16 +743,16 @@
     Fairing_Description=空气动力学整流罩，用于封装有效载荷
     Battery_Description=用于储存电力的电池
     Solar_Panel_Description=太阳能电池板，在展开时发电
-    RTG_Description=同位素温差发电机或RTG
-    Rover_Wheel_Description=用于在行星表面行驶的探测车车轮
+    RTG_Description=放射性同位素热电机（RTG）
+    Rover_Wheel_Description=用于在行星表面行驶的漫游轮
     Docking_Port_Description=可用于将两辆航天器连接在一起的对接口
     Heat_Shield_Description=用于再入大气的隔热罩
     Fuel_Pipe_Description=用于输送燃料的管道
 
 [Modules]
-    Torque_Module_Torque=扭矩：%value%千牛
-    Separation_Force=分离力：%value%千牛
-    Magnet_Force=磁力：%value%千牛
+    Torque_Module_Torque=扭矩：%value%kN
+    Separation_Force=分离力：%value%kN
+    Magnet_Force=磁力：%value%kN
 
     Max_Heat_Tolerance=耐热性：%temperature%
 
@@ -794,7 +770,7 @@
 
     Msg_RCS_Module_State=RCS%state%
 
-    Wheel_Module_State=探测车车轮%state{0}%
+    Wheel_Module_State=漫游轮%state{0}%
     Wheel_On_Label=轮子开启
 
     Panel_Expanded=展开
@@ -864,6 +840,10 @@
     Ganymede{0}=木卫三
     Io{0}=木卫一
     Callisto{0}=木卫四
+    Thebe{0}=木卫十四
+    Thebe{1}=木卫十四
+    Thebe{2}=木卫十四
+    Thebe{3}=木卫十四
     Saturn{0}=土星
     Saturn{1}=土星
     Saturn{2}=土星
@@ -896,6 +876,10 @@
     Dione{1}=土卫四
     Dione{2}=土卫四
     Dione{3}=土卫四
+    Mimas{0}=土卫一
+    Mimas{1}=土卫一
+    Mimas{2}=土卫一
+    Mimas{3}=土卫一
     Uranus{0}=天王星
     Uranus{1}=天王星
     Uranus{2}=天王星
@@ -920,6 +904,10 @@
     Oberon{1}=天卫四
     Oberon{2}=天卫四
     Oberon{3}=天卫四
+    Puck{0}=天卫十五
+    Puck{1}=天卫十五
+    Puck{2}=天卫十五
+    Puck{3}=天卫十五
     Neptune{0}=海王星
     Neptune{1}=海王星
     Neptune{2}=海王星
@@ -932,6 +920,10 @@
     Triton{1}=海卫一
     Triton{2}=海卫一
     Triton{3}=海卫一
+    Naiad{0}=海卫三
+    Naiad{1}=海卫三
+    Naiad{2}=海卫三
+    Naiad{3}=海卫三
     Pluto{0}=冥王星
     Pluto{1}=冥王星
     Pluto{2}=冥王星
@@ -940,6 +932,14 @@
     Charon{1}=卡戎
     Charon{2}=卡戎
     Charon{3}=卡戎
+    Nix{0}=冥卫二
+    Nix{1}=冥卫二
+    Nix{2}=冥卫二
+    Nix{3}=冥卫二
+    Hydra{0}=冥卫三
+    Hydra{1}=冥卫三
+    Hydra{2}=冥卫三
+    Hydra{3}=冥卫三
 
 [Landmarks]
     Sea_of_Tranquility=静海
@@ -990,8 +990,19 @@
 
     Mommur_Chasma=莫姆尔峡谷
 
+    Wunda_Crater=旺达陨石坑
+    Vuver_Crater=乌维陨石坑
+    Skynd_Crater=史金德陨石坑
+
     Telemachus=忒勒玛科斯撞击坑
     Ithaca_Chasma=伊萨卡峡谷
+
+    Bogle_Crater=博格尔陨石坑
+    Lob_Crater=洛布陨石坑
+    Butz_Crater=布茨陨石坑
+
+    Palatine_Chasmata=帕拉蒂尼深谷
+    Evander_Crater=伊万德陨石坑
 
     Tirawa_Crater=蒂拉瓦撞击坑
 
@@ -1007,20 +1018,26 @@
 
     Guttae=古泰
 
+    Herschel_Crater=赫歇尔撞击坑
+
     Sputnik_Planitia=斯普特尼克平原
 
     Serenity_Chasma=宁静峡谷
     Mordor_Macula=魔多黄斑
 
+    Metztli_Crater=梅兹特利陨石坑
+
+    Zethus_Crater=泽图斯陨石坑
+
 [Challenges]
     Liftoff_Title=升空
     Liftoff=升空并安全着陆
 
-    Reach10km_Title=到达10千米
-    Reach10km=到达10千米并安全着陆
+    Reach10km_Title=直抵万米
+    Reach10km=到达10千米高空并安全着陆
 
     ReachSpace_Title=到达太空
-    ReachSpace=到达%height%，并再入大气并安全着陆
+    ReachSpace=到达%height%高空，并再入大气并安全着陆
 
     Land100kmDownrange_Title=着陆100千米之外
     Land100kmDownrange=着陆在距离发射台100千米之外的地方
@@ -1060,20 +1077,20 @@
     Reached_Height=达到%height%海拔高度
 
 [Mod Loader]
-    Mods_Button=Mods
-    Mods_Still_Loading=Mods 还在加载中...
+    Mods_Button=模组
+    Mods_Still_Loading=模组正在加载中...
     ModType_Label=类型：%type%
     Version_Label=版本：%version%
-    CodeMod_Name=代码 Mod
+    CodeMod_Name=代码模组
     PartAssetPack_Name=部件资源包
     TexturePack_Name=纹理资源包
     SolarSystemPack_Name=星系包
-    CodeModNotAllowedOnMobile=不支持：由于移动设备对自定义代码执行的限制，因此不支持带有自定义代码的 Mod
+    CodeModNotAllowedOnMobile=不支持：由于移动设备对自定义代码执行的限制，因此不支持带有自定义代码的模组
     Author_Label=作者：%name%
-    Changes_Warning=你要现在重启游戏，以使 Mod 更改生效吗？
+    Changes_Warning=你要现在重启游戏，以使模组更改生效吗？
     Relaunch=重启
 
-    Set_ModsFolder_Question=选择 Mods 文件夹将同时把游戏保存数据移动到该文件夹中。
+    Set_ModsFolder_Question=选择模组文件夹将同时把游戏保存数据移动到该文件夹中。
     Set_ModsFolder_Question=您的数据将自动复制到该文件夹中。
 
     Lost_Access_Mods=对存储文件夹的访问权限已丢失。
