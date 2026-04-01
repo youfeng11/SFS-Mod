@@ -15,6 +15,88 @@ plugins {
     alias(libs.plugins.aboutlibraries.android)
 }
 
+/** 安装器版本 */
+val installerVersionName = "3.2.1"
+
+/**
+ * 从 SFS 安装包读取版本名与版本号
+ */
+fun readApkVersionViaAapt2(apkFile: File): Pair<Int, String> {
+    val defaultVersion = 1 to "error"
+
+    if (!apkFile.exists()) {
+        println("WARNING: ${apkFile.path} not found, using default version")
+        return defaultVersion
+    }
+
+    val sdkDir = System.getenv("ANDROID_HOME")
+        ?: System.getenv("ANDROID_SDK_ROOT")
+        ?: "${System.getProperty("user.home")}/Android/Sdk"
+
+    val buildToolsBase = File(sdkDir, "build-tools")
+    if (!buildToolsBase.exists()) {
+        println("WARNING: build-tools dir not found: ${buildToolsBase.path}, using default version")
+        return defaultVersion
+    }
+
+    val latestBuildTools = buildToolsBase.listFiles()
+        ?.filter { it.isDirectory }
+        ?.maxByOrNull { it.name }
+        ?: run {
+            println("WARNING: no build-tools found, using default version")
+            return defaultVersion
+        }
+
+    val isWindows = System.getProperty("os.name").lowercase().contains("win")
+    val aapt2 = File(latestBuildTools, if (isWindows) "aapt2.exe" else "aapt2")
+
+    if (!aapt2.exists()) {
+        println("WARNING: aapt2 not found: ${aapt2.path}, using default version")
+        return defaultVersion
+    }
+
+    return try {
+        val process = ProcessBuilder(
+            "sh", "-c",
+            "\"${aapt2.absolutePath}\" dump badging \"${apkFile.absolutePath}\""
+        )
+            .redirectErrorStream(true)
+            .start()
+
+        val output = process.inputStream.bufferedReader(Charsets.UTF_8).readText()
+        process.waitFor()
+
+        println(">>> aapt2 output (first 3 lines):\n${output.lines().take(3).joinToString("\n")}")
+
+        val versionCode = Regex("""versionCode='(\d+)'""").find(output)
+            ?.groupValues?.get(1)?.toIntOrNull()
+            ?: run {
+                println("WARNING: versionCode not found in aapt2 output, using default")
+                return defaultVersion
+            }
+
+        val versionName = Regex("""versionName='([^']+)'""").find(output)
+            ?.groupValues?.get(1)
+            ?: run {
+                println("WARNING: versionName not found in aapt2 output, using default")
+                return defaultVersion
+            }
+
+        val modVersionName = "$versionName-$installerVersionName"
+        println("OK: version read from base.apk.1 -> versionName=$modVersionName, versionCode=$versionCode")
+        Pair(versionCode, modVersionName)
+    } catch (e: Exception) {
+        println("WARNING: aapt2 execution failed: ${e.message}, using default version")
+        defaultVersion
+    }
+}
+
+val apkVersionInfo: Pair<Int, String> by lazy {
+    val apkFile = File(projectDir, "src/main/assets/base.apk.1")
+    readApkVersionViaAapt2(apkFile)
+}
+
+
 val keystoreDir = "$rootDir/keystore"
 val keystoreProps = Properties()
 for (name in arrayOf("release.properties")) {
@@ -32,14 +114,14 @@ android {
         applicationId = "com.StefMorojna.SpaceflightSimulator"
         minSdk = 23
         targetSdk = 36
-        versionCode = 837
-        versionName = "1.6.00.17-3.2.1"
+
+        versionCode = apkVersionInfo.first
+        versionName = apkVersionInfo.second
 
         ndk {
             //noinspection ChromeOsAbiSupport
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
-
     }
 
     signingConfigs {
@@ -79,7 +161,7 @@ android {
             val randomSuffix = UUID.randomUUID().toString().take(6)
             val dateFormat = SimpleDateFormat("yyMMdd")
             val currentDateTime = dateFormat.format(Date())
-            versionNameSuffix = ".$currentDateTime.$randomSuffix" // 使用UTC时间
+            versionNameSuffix = ".$currentDateTime.$randomSuffix"
             applicationIdSuffix = ".debug"
         }
     }
@@ -88,6 +170,7 @@ android {
         buildConfig = true
         compose = true
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -98,7 +181,6 @@ android {
         includeInApk = false
         includeInBundle = false
     }
-
 
     aboutLibraries {
         collect {
