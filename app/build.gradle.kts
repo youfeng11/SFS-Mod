@@ -8,7 +8,6 @@ import java.util.UUID
 
 plugins {
     alias(libs.plugins.agp.app)
-    alias(libs.plugins.kotlin)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.compose.compiler)
@@ -65,12 +64,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -106,6 +99,7 @@ android {
         includeInBundle = false
     }
 
+
     aboutLibraries {
         collect {
             configPath = file("aboutlibs_config")
@@ -114,6 +108,12 @@ android {
             duplicationMode = DuplicateMode.MERGE
             duplicationRule = DuplicateRule.SIMPLE
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 

@@ -16,6 +16,9 @@ pluginManagement {
     maven { setUrl("https://androidx.dev/storage/compose-compiler/repository/") }
   }
 }
+plugins {
+  id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
 
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
