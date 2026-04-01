@@ -1,8 +1,8 @@
 package com.youfeng.sfsmod.ui.component
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +27,7 @@ import com.youfeng.sfsmod.R
  * @param onDismissRequest 关闭对话框的回调
  * 实现特性：
  * - 使用aboutlibraries库展示依赖项信息
- * - 自适应全屏高度
+ * - 动态自适应高度，并适配大屏幕宽度
  */
 @Composable
 fun CreditsDialog(onDismissRequest: () -> Unit) {
@@ -36,13 +36,14 @@ fun CreditsDialog(onDismissRequest: () -> Unit) {
         properties = DialogProperties(usePlatformDefaultWidth = false),
         modifier = Modifier
             .fillMaxWidth()
+            .widthIn(max = 512.dp) 
             .padding(horizontal = 36.dp),
         title = { Text(stringResource(R.string.osl)) },
         text = {
             val libraries by produceLibraries(R.raw.aboutlibraries)
             LibrariesContainer(
                 libraries = libraries,
-                modifier = Modifier.fillMaxSize(), // 全屏高度显示库列表
+                modifier = Modifier.fillMaxWidth(),
                 colors = LibraryDefaults.libraryColors(
                     libraryBackgroundColor = Color.Transparent,
                     dialogBackgroundColor = MaterialTheme.colorScheme.background
@@ -51,9 +52,7 @@ fun CreditsDialog(onDismissRequest: () -> Unit) {
                     HorizontalDivider(
                         Modifier
                             .fillMaxWidth()
-                            .padding(
-                                horizontal = 8.dp
-                            )
+                            .padding(horizontal = 8.dp)
                     )
                 },
                 licenseDialogConfirmText = stringResource(R.string.ok)
@@ -61,16 +60,12 @@ fun CreditsDialog(onDismissRequest: () -> Unit) {
         },
         confirmButton = {
             TextButton(onClick = onDismissRequest) {
-                Text(stringResource(R.string.close)) // 关闭按钮本地化文本
+                Text(stringResource(R.string.close))
             }
         }
     )
 }
 
-/**
- * 对话框预览组件
- * 用于Android Studio的Compose预览功能
- */
 @Preview
 @Composable
 private fun CreditsDialogPreview() {
