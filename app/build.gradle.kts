@@ -4,10 +4,7 @@ import com.mikepenz.aboutlibraries.plugin.DuplicateMode
 import com.mikepenz.aboutlibraries.plugin.DuplicateRule
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Properties
-import java.util.UUID
 
 plugins {
     alias(libs.plugins.agp.app)
@@ -134,10 +131,7 @@ android {
         }
 
         debug {
-            val randomSuffix = UUID.randomUUID().toString().take(6)
-            val dateFormat = SimpleDateFormat("yyMMdd")
-            val currentDateTime = dateFormat.format(Date())
-            versionNameSuffix = ".$currentDateTime.$randomSuffix"
+            versionNameSuffix = "-debug"
             applicationIdSuffix = ".debug"
         }
     }
