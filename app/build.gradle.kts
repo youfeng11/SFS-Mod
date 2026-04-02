@@ -1,5 +1,8 @@
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.mikepenz.aboutlibraries.plugin.DuplicateMode
 import com.mikepenz.aboutlibraries.plugin.DuplicateRule
+import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -19,83 +22,56 @@ plugins {
 val installerVersionName = "3.2.1"
 
 /**
- * 从 SFS 安装包读取版本名与版本号
+ * 获取SFS安装包版本信息
  */
-fun readApkVersionViaAapt2(apkFile: File): Pair<Int, String> {
-    val defaultVersion = 1 to "error"
+fun getSfsVersionInfo(): Pair<Int, String> {
+    val apkFile = project.file("src/main/assets/base.apk.1")
+
+    /** 获取失败时使用的版本 */
+    val fallbackVersion = 1 to "error"
 
     if (!apkFile.exists()) {
-        println("WARNING: ${apkFile.path} not found, using default version")
-        return defaultVersion
+        println("[Build] WARNING: APK file not found at ${apkFile.absolutePath}. Using fallback version.")
+        return fallbackVersion
     }
 
-    val sdkDir = System.getenv("ANDROID_HOME")
-        ?: System.getenv("ANDROID_SDK_ROOT")
-        ?: "${System.getProperty("user.home")}/Android/Sdk"
+    try {
+        val androidExtension = project.extensions.getByType<ApplicationExtension>()
+        val androidComponents =
+            project.extensions.getByType<ApplicationAndroidComponentsExtension>()
 
-    val buildToolsBase = File(sdkDir, "build-tools")
-    if (!buildToolsBase.exists()) {
-        println("WARNING: build-tools dir not found: ${buildToolsBase.path}, using default version")
-        return defaultVersion
-    }
+        val sdkDir = androidComponents.sdkComponents.sdkDirectory.get().asFile
+        val buildToolsVersion = androidExtension.buildToolsVersion
+        val aapt2Name = if (OperatingSystem.current().isWindows) "aapt2.exe" else "aapt2"
+        val aapt2 = File(sdkDir, "build-tools/$buildToolsVersion/$aapt2Name")
 
-    val latestBuildTools = buildToolsBase.listFiles()
-        ?.filter { it.isDirectory }
-        ?.maxByOrNull { it.name }
-        ?: run {
-            println("WARNING: no build-tools found, using default version")
-            return defaultVersion
+        if (!aapt2.exists()) {
+            println("[Build] ERROR: aapt2 utility not found at ${aapt2.absolutePath}. Using fallback version.")
+            return fallbackVersion
         }
 
-    val isWindows = System.getProperty("os.name").lowercase().contains("win")
-    val aapt2 = File(latestBuildTools, if (isWindows) "aapt2.exe" else "aapt2")
+        val output = project.providers.exec {
+            commandLine(aapt2.absolutePath, "dump", "badging", apkFile.absolutePath)
+        }.standardOutput.asText.get()
 
-    if (!aapt2.exists()) {
-        println("WARNING: aapt2 not found: ${aapt2.path}, using default version")
-        return defaultVersion
-    }
+        val vCode = Regex("versionCode='(\\d+)'").find(output)?.groupValues?.get(1)?.toInt() ?: 1
+        val vName = Regex("versionName='([^']+)'").find(output)?.groupValues?.get(1) ?: "unknown"
 
-    return try {
-        val process = ProcessBuilder(
-            "sh", "-c",
-            "\"${aapt2.absolutePath}\" dump badging \"${apkFile.absolutePath}\""
-        )
-            .redirectErrorStream(true)
-            .start()
-
-        val output = process.inputStream.bufferedReader(Charsets.UTF_8).readText()
-        process.waitFor()
-
-        println(">>> aapt2 output (first 3 lines):\n${output.lines().take(3).joinToString("\n")}")
-
-        val versionCode = Regex("""versionCode='(\d+)'""").find(output)
-            ?.groupValues?.get(1)?.toIntOrNull()
-            ?: run {
-                println("WARNING: versionCode not found in aapt2 output, using default")
-                return defaultVersion
-            }
-
-        val versionName = Regex("""versionName='([^']+)'""").find(output)
-            ?.groupValues?.get(1)
-            ?: run {
-                println("WARNING: versionName not found in aapt2 output, using default")
-                return defaultVersion
-            }
-
-        val modVersionName = "$versionName-$installerVersionName"
-        println("OK: version read from base.apk.1 -> versionName=$modVersionName, versionCode=$versionCode")
-        Pair(versionCode, modVersionName)
+        val result = vCode to vName
+        println("[Build] SUCCESS: Read version from APK -> versionCode=${result.first}, versionName=${result.second}")
+        return result
     } catch (e: Exception) {
-        println("WARNING: aapt2 execution failed: ${e.message}, using default version")
-        defaultVersion
+        println("[Build] EXCEPTION: Failed to read APK version (${e.message}). Using fallback version.")
+        return fallbackVersion
     }
 }
 
-val apkVersionInfo: Pair<Int, String> by lazy {
-    val apkFile = File(projectDir, "src/main/assets/base.apk.1")
-    readApkVersionViaAapt2(apkFile)
+val versionInfo by lazy {
+    val (sfsVersionCode, sfsVersionName) = getSfsVersionInfo()
+    (sfsVersionCode to "$sfsVersionName-$installerVersionName").also { (vCode, vName) ->
+        println("[Build] INFO: Using versionCode=$vCode, versionName=$vName")
+    }
 }
-
 
 val keystoreDir = "$rootDir/keystore"
 val keystoreProps = Properties()
@@ -115,8 +91,8 @@ android {
         minSdk = 23
         targetSdk = 36
 
-        versionCode = apkVersionInfo.first
-        versionName = apkVersionInfo.second
+        versionCode = versionInfo.first
+        versionName = versionInfo.second
 
         ndk {
             //noinspection ChromeOsAbiSupport
