@@ -151,21 +151,21 @@ android {
         includeInApk = false
         includeInBundle = false
     }
-
-    aboutLibraries {
-        collect {
-            configPath = file("aboutlibs_config")
-        }
-        library {
-            duplicationMode = DuplicateMode.MERGE
-            duplicationRule = DuplicateRule.SIMPLE
-        }
-    }
 }
 
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_21)
+    }
+}
+
+aboutLibraries {
+    collect {
+        configPath = file("aboutlibs_config")
+    }
+    library {
+        duplicationMode = DuplicateMode.MERGE
+        duplicationRule = DuplicateRule.SIMPLE
     }
 }
 
