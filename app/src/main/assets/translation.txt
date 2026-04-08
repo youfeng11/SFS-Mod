@@ -200,7 +200,7 @@
     Load_Failed=无法从%filepath%加载%filetype%
 
 [Purchasing]
-    Open_Shop_Menu=拓展包
+    Open_Shop_Menu=商店
     Open_Shop_Menu_2=打开商店
     Expansions_List_Title=拓展包
     Bundles_List_Title=捆绑包
