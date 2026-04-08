@@ -16,7 +16,7 @@ plugins {
 }
 
 /** 安装器版本 */
-val installerVersionName = "3.2.1"
+val installerVersionName = "3.3.0"
 
 /**
  * 获取SFS安装包版本信息
