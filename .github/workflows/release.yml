@@ -26,20 +26,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Parse SDK versions
-        id: parse-versions
-        run: |
-          COMPILE_SDK=$(grep -R "compileSdk" app/build.gradle.kts \
-              | sed -E 's/.*compileSdk\s*=\s*([0-9]+).*/\1/' | head -n 1)
-          if [ -z "$COMPILE_SDK" ]; then COMPILE_SDK=36; fi
-          echo "Found compileSdk: $COMPILE_SDK"
-          echo "COMPILE_SDK=$COMPILE_SDK" >> $GITHUB_ENV
-
-      - name: Set up Android SDK and NDK
-        uses: android-actions/setup-android@v4
-        with:
-          packages: "platforms;android-${{ env.COMPILE_SDK }} ndk;25.2.9519653"
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
