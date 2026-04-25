@@ -30,7 +30,7 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-materialIcons = { group = "androidx.compose.material", name = "material-icons-extended" }
 
-androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt" }
+androdix-hilt-lifecycle-viewmodel-compose = { group = "androidx.hilt", name = "hilt-lifecycle-viewmodel-compose", version.ref = "hilt" }
 androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 
