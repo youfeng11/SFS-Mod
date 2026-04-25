@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">航天模拟器</string>
     <string name="topbar_title">航天模拟器安装器</string>
-    <string name="about_source_code"><![CDATA[<a href="https://youfeng11.github.io/">由风</a> 制作<br/>在 <a href="https://gitee.com/YouFeng11/SFS-Mod">Gitee</a> 查看源码<br/>加入我们的 <a href="mqqapi://card/show_pslcard?src_type=internal&version=1&card_type=group&uin=539945982">QQ群</a><br/>请支持正版 <a href="https://spaceflightsimulator.com/">SFS</a>]]></string>
+    <string name="about_source_code"><![CDATA[<a href="https://youfeng11.github.io/">由风</a> 制作<br/>在 <a href="https://github.com/youfeng11/SFS-Mod">GitHub</a> 查看源码<br/>加入我们的 <a href="mqqapi://card/show_pslcard?src_type=internal&version=1&card_type=group&uin=539945982">QQ群</a><br/>请支持正版 <a href="https://spaceflightsimulator.com/">SFS</a>]]></string>
     <string name="loading">释放资源中…</string>
     <string name="warning">仅供个人学习研究使用，请在下载后24小时内删除！</string>
     <string name="osl">开放源代码许可</string>
