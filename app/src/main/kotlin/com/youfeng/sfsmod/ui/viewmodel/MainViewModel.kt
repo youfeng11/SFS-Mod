@@ -10,7 +10,6 @@ import com.youfeng.sfsmod.domain.usecase.VerifySignatureUseCase
 import com.youfeng.sfsmod.ui.event.UiEvent
 import com.youfeng.sfsmod.ui.state.AppState
 import com.youfeng.sfsmod.ui.state.UiState
-import com.youfeng.sfsmod.util.DeviceInfo
 import com.youfeng.sfsmod.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -168,7 +167,6 @@ class MainViewModel @Inject constructor(
                 is VerifySignatureState.SignatureMismatch -> UiText.StringResource(R.string.error_signature_mismatch)
                 is VerifySignatureState.SignatureUnavailableThis -> UiText.StringResource(R.string.error_null_this_signature)
                 is VerifySignatureState.SignatureUnavailableApk -> UiText.StringResource(R.string.error_null_apk_signature)
-                else -> UiText.StringResource(R.string.error_unknown, DeviceInfo.DeviceInfoString)
             }
             _uiState.update { it.copy(appState = AppState.Error(errMessage)) }
         }
