@@ -80,12 +80,12 @@ if (releasePropsFile.exists()) {
 
 android {
     namespace = "com.youfeng.sfsmod"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.StefMorojna.SpaceflightSimulator"
         minSdk = 23
-        targetSdk = 36
+        targetSdk = 37
 
         versionCode = versionInfo.first
         versionName = versionInfo.second
