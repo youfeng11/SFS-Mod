@@ -1,8 +1,12 @@
-# 下载
+# 航天模拟器安装器
+
+历史内容请前往 [Gitee](https://gitee.com/YouFeng11/SFS-Mod)
+
+## 下载
 
 - **[发行版](https://github.com/youfeng11/SFS-Mod/releases/latest)**
 
-# 开源协议
+## 开源协议
 
 对于 [由风](https://github.com/youfeng11) 拥有的著作权的部分，以下声明适用
 
