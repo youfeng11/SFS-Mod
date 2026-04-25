@@ -72,11 +72,10 @@ val versionInfo by lazy {
 
 val keystoreDir = "$rootDir/keystore"
 val keystoreProps = Properties()
-for (name in arrayOf("release.properties")) {
-    val f = file("$keystoreDir/$name")
-    if (!f.exists()) continue
-    keystoreProps.load(f.inputStream())
-    break
+val releasePropsFile = file("$keystoreDir/release.properties")
+
+if (releasePropsFile.exists()) {
+    keystoreProps.load(releasePropsFile.inputStream())
 }
 
 android {
@@ -98,16 +97,19 @@ android {
     }
 
     signingConfigs {
-        val keyAlias = keystoreProps.getProperty("keyAlias")
-        val keyPassword = keystoreProps.getProperty("keyPassword")
-        val storeFile = file("$keystoreDir/${keystoreProps.getProperty("storeFile")}")
-        val storePassword = keystoreProps.getProperty("storePassword")
-
         create("release") {
-            this.keyAlias = keyAlias
-            this.keyPassword = keyPassword
-            this.storeFile = storeFile
-            this.storePassword = storePassword
+            val keyAliasValue = keystoreProps.getProperty("keyAlias") ?: System.getenv("SIGN_KEY_ALIAS")
+            val keyPasswordValue = keystoreProps.getProperty("keyPassword") ?: System.getenv("SIGN_KEY_PASSWORD")
+            val storeFileValue = keystoreProps.getProperty("storeFile") ?: System.getenv("SIGN_STORE_FILE") ?: "release.jks"
+            val storePasswordValue = keystoreProps.getProperty("storePassword") ?: System.getenv("SIGN_STORE_PASSWORD")
+
+            val keystoreTargetFile = file("$keystoreDir/$storeFileValue")
+
+            keyAlias = keyAliasValue
+            keyPassword = keyPasswordValue
+            storeFile = keystoreTargetFile
+            storePassword = storePasswordValue
+
             enableV1Signing = true
             enableV2Signing = true
             enableV3Signing = true
