@@ -27,7 +27,9 @@ class MainActivity : ComponentActivity() {
                 getString(R.string.not_supported_info, Locale.getDefault().country)
             )
             finish()
+            return
         }
+
         setContent {
             MainTheme {
                 MainScreen()
