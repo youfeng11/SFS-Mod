@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okio.Path
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * 主界面ViewModel，负责：
@@ -159,7 +160,7 @@ class MainViewModel @Inject constructor(
         if (result is VerifySignatureState.SignatureValid) {
             for (timer in 3 downTo 0) {
                 _uiState.update { it.copy(appState = AppState.Done(timer)) }
-                delay(1000)
+                delay(1000.milliseconds)
             }
             _uiEvent.trySend(UiEvent.NavigateToInstall(apkPath))
         } else {
